@@ -86,10 +86,10 @@ class MainWindowQt(QtWidgets.QWidget):
             self._update_and_save()
         elif column == 1:
             due = item.data(QtCore.Qt.DisplayRole)
-            self._set_due(task, due)
+            self._set_due(task, due.toPython())
         elif column == 2:
             snoozed = item.data(QtCore.Qt.DisplayRole)
-            self._set_snooze(task, snoozed)
+            self._set_snooze(task, snoozed.toPython())
 
     def _update_and_save(self) -> None:
         if self._task_manager is None:
@@ -123,10 +123,12 @@ class MainWindowQt(QtWidgets.QWidget):
         self._update_and_save()
 
 
-def _date_to_qdate(date: Optional[date]) -> QtCore.QDate:
-    if date is None:
+def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:
+    if task_date is None:
         return QtCore.QDate()
-    return QtCore.QDate(date.year(), date.month(), date.day())
+    if isinstance(task_date, QtCore.QDate):
+        return task_date
+    return QtCore.QDate(task_date.year, task_date.month, task_date.day)
 
 
 def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
