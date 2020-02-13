@@ -50,15 +50,10 @@ class MainWindowQt(QtWidgets.QWidget):
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         mime_data = event.mimeData()
-        # DEBUG
-        print(4)
         if mime_data.hasUrls():
-            print(5)
             event.acceptProposedAction()
 
     def dropEvent(self, event: QtGui.QDropEvent) -> None:
-        # DEBUG
-        print(6)
         path = event.mimeData().urls()[0]
         task_manager_path = Path(path.toLocalFile())
         self.load_from_file(task_manager_path)
