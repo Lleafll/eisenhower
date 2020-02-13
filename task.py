@@ -23,6 +23,10 @@ def has_snoozed_date(task: Task) -> bool:
 
 def sort_tasks_by_relevance(
         tasks: Sequence[Task]) -> Generator[Task, None, None]:
-    yield from filterfalse(has_snoozed_date, filter(has_due_date, tasks))
+    yield from sorted(
+            filterfalse(has_snoozed_date, filter(has_due_date, tasks)),
+            key=lambda task: task.due)
     yield from filterfalse(has_snoozed_date, filterfalse(has_due_date, tasks))
-    yield from filter(has_snoozed_date, tasks)
+    yield from sorted(
+            filter(has_snoozed_date, tasks),
+            key=lambda task: task.snooze)
