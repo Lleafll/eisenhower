@@ -1,5 +1,5 @@
 from PySide2 import QtWidgets, QtCore
-from task import Task
+from task import Task, has_due_date, has_snoozed_date
 
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
@@ -26,14 +26,16 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         context_menu = QtWidgets.QMenu()
         if index.isValid():
             task = index.data(TASK_ROLE)
-            remove_due_action = QtWidgets.QAction("Remove Due")
-            remove_due_action.triggered.connect(
-                    lambda: self.remove_due_requested.emit(task))
-            context_menu.addAction(remove_due_action)
-            remove_snooze_action = QtWidgets.QAction("Remove Snooze")
-            remove_snooze_action.triggered.connect(
-                    lambda: self.remove_snooze_requested.emit(task))
-            context_menu.addAction(remove_snooze_action)
+            if has_due_date(task):
+                remove_due_action = QtWidgets.QAction("Remove Due")
+                remove_due_action.triggered.connect(
+                        lambda: self.remove_due_requested.emit(task))
+                context_menu.addAction(remove_due_action)
+            if has_snoozed_date(task):
+                remove_snooze_action = QtWidgets.QAction("Remove Snooze")
+                remove_snooze_action.triggered.connect(
+                        lambda: self.remove_snooze_requested.emit(task))
+                context_menu.addAction(remove_snooze_action)
             delete_action = QtWidgets.QAction("Delete")
             delete_action.triggered.connect(
                     lambda: self.delete_task_requested.emit(task))
