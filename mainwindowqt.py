@@ -22,6 +22,7 @@ class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.showMaximized()
+        self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
         self._task_manager: Optional[TaskManagerWrapper] = None
         self._do_list = TreeViewWithContextMenu(self)
