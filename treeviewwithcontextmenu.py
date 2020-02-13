@@ -16,6 +16,9 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.header().setSectionResizeMode(
+                QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        self.header().setStretchLastSection(False)
         self.customContextMenuRequested.connect(self._open_context_menu)
 
     def _open_context_menu(self, point: QtCore.QPoint) -> None:
