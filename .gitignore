@@ -1,0 +1,5 @@
+.mypy_cache/
+*.swp
+__pycache__/
+Thumbs.db
+todo.todo
