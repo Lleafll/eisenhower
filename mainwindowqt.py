@@ -130,7 +130,7 @@ class MainWindowQt(QtWidgets.QWidget):
 def _date_to_qdate(date: Optional[date]) -> QtCore.QDate:
     if date is None:
         return QtCore.QDate()
-    return QtCore.QDate(date.year, date.month, date.day)
+    return QtCore.QDate(date.year(), date.month(), date.day())
 
 
 def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
