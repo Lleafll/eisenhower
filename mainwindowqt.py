@@ -1,5 +1,5 @@
 from PySide2 import QtWidgets, QtGui, QtCore
-from task import Task, sort_tasks_by_relevance
+from task import Task, sort_tasks_by_relevance, has_snoozed_date
 from taskmanager import (
     TaskManager,
     load_task_manager,
@@ -139,7 +139,8 @@ def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
 def _build_row(task: Task) -> Tuple[QtGui.QStandardItem, ...]:
     name_item = QtGui.QStandardItem(task.name)
     due_item = _build_date_item(task.due)
-    snoozed_item = _build_date_item(task.snooze)
+    snoozed_item = _build_date_item(
+            task.snooze if has_snoozed_date(task) else None)
     items = (name_item, due_item, snoozed_item)
     for item in items:
         item.setData(task, role=TASK_ROLE)
