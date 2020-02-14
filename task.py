@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional, Sequence, Generator
+from typing import Optional, Sequence, Tuple, List
 from itertools import filterfalse
 
 
@@ -22,11 +22,13 @@ def has_snoozed_date(task: Task) -> bool:
 
 
 def sort_tasks_by_relevance(
-        tasks: Sequence[Task]) -> Generator[Task, None, None]:
-    yield from sorted(
+        tasks: Sequence[Task]) -> Tuple[List[Task], List[Task], List[Task]]:
+    due_tasks = sorted(
             filterfalse(has_snoozed_date, filter(has_due_date, tasks)),
             key=lambda task: task.due)
-    yield from filterfalse(has_snoozed_date, filterfalse(has_due_date, tasks))
-    yield from sorted(
+    normal_tasks = list(
+            filterfalse(has_snoozed_date, filterfalse(has_due_date, tasks)))
+    snoozed_tasks = sorted(
             filter(has_snoozed_date, tasks),
             key=lambda task: task.snooze)
+    return due_tasks, normal_tasks, snoozed_tasks
