@@ -6,10 +6,10 @@ TASK_ROLE = QtCore.Qt.UserRole + 1
 
 
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
+    add_task_requested = QtCore.Signal(str)
     delete_task_requested = QtCore.Signal(Task)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
-    add_task_requested = QtCore.Signal(str)
 
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)

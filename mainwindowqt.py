@@ -1,15 +1,12 @@
-from PySide2 import QtWidgets, QtGui, QtCore
-from task import Task, sort_tasks_by_relevance, has_snoozed_date
+from PySide2 import QtWidgets, QtGui
+from task import Task
 from taskmanager import (
-    TaskManager,
-    load_task_manager,
-    save_task_manager,
-    Priority)
-from typing import Optional, Sequence, Tuple
+        TaskManager, load_task_manager, save_task_manager, Priority)
+from typing import Optional
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import date
-from treeviewwithcontextmenu import TreeViewWithContextMenu, TASK_ROLE
+from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 
 
 @dataclass(frozen=True)
@@ -25,14 +22,17 @@ class MainWindowQt(QtWidgets.QWidget):
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
         self._task_manager: Optional[TaskManagerWrapper] = None
-        self._do_list = TreeViewWithContextMenu(self)
-        self._decide_list = TreeViewWithContextMenu(self)
-        self._delegate_list = TreeViewWithContextMenu(self)
+        self._do_list = SeparatedTreeViewWithContextMenu(self)
+        self._decide_list = SeparatedTreeViewWithContextMenu(self)
+        self._delegate_list = SeparatedTreeViewWithContextMenu(self)
         layout = QtWidgets.QHBoxLayout(self)
         for task_list in (
                 self._do_list, self._decide_list, self._delegate_list):
             layout.addWidget(task_list)
             task_list.delete_task_requested.connect(self._delete_task)
+            task_list.rename_task_requested.connect(self._rename_task)
+            task_list.schedule_task_requested.connect(self._set_due)
+            task_list.snooze_task_requested.connect(self._set_snooze)
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
         self._do_list.add_task_requested.connect(
@@ -71,25 +71,7 @@ class MainWindowQt(QtWidgets.QWidget):
                     (Priority.delegate, self._delegate_list)):
                 task_list.show()
                 tasks = self._task_manager.instance.tasks(priority)
-                model = _build_tree_view_model(tasks)
-                task_list.setModel(model)
-                model.itemChanged.connect(self._item_changed)
-
-    def _item_changed(self, item: QtGui.QStandardItem) -> None:
-        if self._task_manager is None:
-            return
-        task = item.data(TASK_ROLE)
-        column = item.column()
-        if column == 0:
-            new_name = item.data(QtCore.Qt.DisplayRole)
-            self._task_manager.instance.rename(task, new_name)
-            self._update_and_save()
-        elif column == 1:
-            due = item.data(QtCore.Qt.DisplayRole)
-            self._set_due(task, due.toPython())
-        elif column == 2:
-            snoozed = item.data(QtCore.Qt.DisplayRole)
-            self._set_snooze(task, snoozed.toPython())
+                task_list.add_tasks(tasks)
 
     def _update_and_save(self) -> None:
         if self._task_manager is None:
@@ -110,6 +92,12 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.delete(task)
         self._update_and_save()
 
+    def _rename_task(self, task: Task, name: str) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.rename(task, name)
+        self._update_and_save()
+
     def _set_due(self, task: Task, due: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
@@ -121,39 +109,3 @@ class MainWindowQt(QtWidgets.QWidget):
             return
         self._task_manager.instance.snooze(task, snooze)
         self._update_and_save()
-
-
-def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:
-    if task_date is None:
-        return QtCore.QDate()
-    if isinstance(task_date, QtCore.QDate):
-        return task_date
-    return QtCore.QDate(task_date.year, task_date.month, task_date.day)
-
-
-def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
-    qdate = _date_to_qdate(date)
-    item = QtGui.QStandardItem()
-    item.setData(qdate, QtCore.Qt.DisplayRole)
-    return item
-
-
-def _build_row(task: Task) -> Tuple[QtGui.QStandardItem, ...]:
-    name_item = QtGui.QStandardItem(task.name)
-    due_item = _build_date_item(task.due)
-    snoozed_item = _build_date_item(
-            task.snooze if has_snoozed_date(task) else None)
-    items = (name_item, due_item, snoozed_item)
-    for item in items:
-        item.setData(task, role=TASK_ROLE)
-    return items
-
-
-def _build_tree_view_model(
-        tasks: Sequence[Task]) -> QtGui.QStandardItemModel:
-    model = QtGui.QStandardItemModel()
-    model.setHorizontalHeaderLabels(("Name", "Due", "Snoozed"))
-    for task in sort_tasks_by_relevance(tasks):
-        row = _build_row(task)
-        model.appendRow(row)
-    return model
