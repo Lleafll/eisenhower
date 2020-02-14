@@ -5,6 +5,50 @@ from typing import Sequence, Optional, Tuple
 from datetime import date
 
 
+class CalendarDelegate(QtWidgets.QItemDelegate):
+    def __init__(self, parent: QtCore.QObject):
+        super().__init__(parent)
+
+    def paint(
+            self,
+            painter: QtGui.QPainter,
+            option: QtWidgets.QStyleOptionViewItem,
+            index: QtCore.QModelIndex) -> None:
+        text = index.model().data(index, QtCore.Qt.DisplayRole).toString(
+                QtCore.Qt.SystemLocaleDate)
+        option.displayAlignment = \
+            QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
+        self.drawDisplay(painter, option, option.rect, text)
+        self.drawFocus(painter, option, option.rect)
+
+    def createEditor(
+            self,
+            parent: QtWidgets.QWidget,
+            option: QtWidgets.QStyleOptionViewItem,
+            index: QtCore.QModelIndex) -> QtWidgets.QWidget:
+        date_edit = QtWidgets.QDateEdit(parent)
+        date_edit.setCalendarPopup(True)
+        date_edit.setDisplayFormat("dd.MM.yyyy")
+        return date_edit
+
+    def setEditorData(
+            self,
+            editor: QtWidgets.QWidget,
+            index: QtCore.QModelIndex) -> None:
+        date = index.model().data(index, QtCore.Qt.DisplayRole)
+        if date.isNull():
+            date = QtCore.QDate.currentDate()
+        editor.setDate(date)
+
+    def setModelData(
+            self,
+            editor: QtWidgets.QWidget,
+            model: QtCore.QAbstractItemModel,
+            index: QtCore.QModelIndex) -> None:
+        date = editor.date()
+        model.setData(index, date)
+
+
 class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     add_task_requested = QtCore.Signal(str)
     delete_task_requested = QtCore.Signal(Task)
@@ -35,6 +79,10 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         self._lower_list.setModel(lower_model)
         upper_model.itemChanged.connect(self._item_changed)
         lower_model.itemChanged.connect(self._item_changed)
+        self._upper_list.setItemDelegateForColumn(1, CalendarDelegate(self))
+        self._upper_list.setItemDelegateForColumn(2, CalendarDelegate(self))
+        self._lower_list.setItemDelegateForColumn(1, CalendarDelegate(self))
+        self._lower_list.setItemDelegateForColumn(2, CalendarDelegate(self))
 
     def _item_changed(self, item: QtGui.QStandardItem) -> None:
         task = item.data(TASK_ROLE)
