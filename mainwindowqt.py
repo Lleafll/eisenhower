@@ -22,6 +22,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
         self._task_manager: Optional[TaskManagerWrapper] = None
+        self._history: List[TaskManager] = []
         self._do_list = SeparatedTreeViewWithContextMenu(self)
         self._decide_list = SeparatedTreeViewWithContextMenu(self)
         self._delegate_list = SeparatedTreeViewWithContextMenu(self)
