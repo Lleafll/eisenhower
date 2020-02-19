@@ -22,19 +22,30 @@ class MainWindowQt(QtWidgets.QWidget):
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
         self._task_manager: Optional[TaskManagerWrapper] = None
+        layout = QtWidgets.QVBoxLayout(self)
+        self._undo_button = QtWidgets.QPushButton("Undo")
+        self._redo_button = QtWidgets.QPushButton("Redo")
+        button_layout = QtWidgets.QHBoxLayout()
+        layout.addLayout(button_layout)
+        button_layout.addWidget(self._undo_button)
+        button_layout.addWidget(self._redo_button)
+        button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(self)
         self._decide_list = SeparatedTreeViewWithContextMenu(self)
         self._delegate_list = SeparatedTreeViewWithContextMenu(self)
-        layout = QtWidgets.QHBoxLayout(self)
+        task_layout = QtWidgets.QHBoxLayout()
+        layout.addLayout(task_layout)
         for task_list in (
                 self._do_list, self._decide_list, self._delegate_list):
-            layout.addWidget(task_list)
+            task_layout.addWidget(task_list)
             task_list.delete_task_requested.connect(self._delete_task)
             task_list.rename_task_requested.connect(self._rename_task)
             task_list.schedule_task_requested.connect(self._set_due)
             task_list.snooze_task_requested.connect(self._set_snooze)
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
+        self._undo_button.clicked.connect(self._undo)
+        self._redo_button.clicked.connect(self._redo)
         self._do_list.add_task_requested.connect(
                 lambda text: self._add_task(text, Priority.do))
         self._decide_list.add_task_requested.connect(
@@ -64,6 +75,8 @@ class MainWindowQt(QtWidgets.QWidget):
             self._do_list.hide()
             self._decide_list.hide()
             self._delegate_list.hide()
+            self._undo_button.hide()
+            self._redo_button.hide()
         else:
             for priority, task_list in (
                     (Priority.do, self._do_list),
@@ -72,6 +85,12 @@ class MainWindowQt(QtWidgets.QWidget):
                 task_list.show()
                 tasks = self._task_manager.instance.tasks(priority)
                 task_list.add_tasks(tasks)
+            self._undo_button.show()
+            self._redo_button.show()
+            self._undo_button.setEnabled(
+                    self._task_manager.instance.is_undoable())
+            self._redo_button.setEnabled(
+                    self._task_manager.instance.is_redoable())
 
     def _update_and_save(self) -> None:
         if self._task_manager is None:
@@ -108,4 +127,16 @@ class MainWindowQt(QtWidgets.QWidget):
         if self._task_manager is None:
             return
         self._task_manager.instance.snooze(task, snooze)
+        self._update_and_save()
+
+    def _undo(self) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.undo()
+        self._update_and_save()
+
+    def _redo(self) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.redo()
         self._update_and_save()
