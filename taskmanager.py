@@ -10,8 +10,8 @@ from collections import defaultdict
 
 
 class TaskManager:
-    def __init__(self) -> None:
-        self._history = History(defaultdict(list))
+    def __init__(self, tasks: Tasks = defaultdict(list)) -> None:
+        self._history = History(tasks)
 
     def tasks(self, priority: Priority) -> Sequence[Task]:
         return self._history.present()[priority]
@@ -83,9 +83,10 @@ def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
 def load_task_manager(import_path: Path) -> TaskManager:
     try:
         with open(import_path, "rb") as file:
-            return load(file)
+            task_manager = load(file)
     except FileNotFoundError:
-        return TaskManager()
+        task_manager = TaskManager()
+    return task_manager
 
 
 def save_task_manager(export_path: Path, task_manager: TaskManager) -> None:
