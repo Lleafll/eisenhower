@@ -39,6 +39,7 @@ class History:
 
     def write_history(self) -> Tasks:
         new_present = deepcopy(self.present())
-        self._tasks.append(new_present)
         self._current += 1
+        del self._tasks[self._current:]
+        self._tasks.append(new_present)
         return new_present
