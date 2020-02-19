@@ -51,6 +51,7 @@ class CalendarDelegate(QtWidgets.QItemDelegate):
 
 class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     add_task_requested = QtCore.Signal(str)
+    complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
     rename_task_requested = QtCore.Signal(Task, str)
     schedule_task_requested = QtCore.Signal(Task, date)
@@ -66,13 +67,16 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         for task_list in (self._upper_list, self._lower_list):
             layout.addWidget(task_list)
             task_list.add_task_requested.connect(self.add_task_requested)
+            task_list.complete_task_requested.connect(
+                    self.complete_task_requested)
             task_list.delete_task_requested.connect(self.delete_task_requested)
             task_list.remove_due_requested.connect(self.remove_due_requested)
             task_list.remove_snooze_requested.connect(
                     self.remove_snooze_requested)
 
     def add_tasks(self, tasks: Sequence[Task]) -> None:
-        due_tasks, normal_tasks, snoozed_tasks = sort_tasks_by_relevance(tasks)
+        due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \
+                sort_tasks_by_relevance(tasks)
         upper_model = _build_tree_view_model(due_tasks + normal_tasks)
         self._upper_list.setModel(upper_model)
         lower_model = _build_tree_view_model(snoozed_tasks)

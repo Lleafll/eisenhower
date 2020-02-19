@@ -7,6 +7,7 @@ TASK_ROLE = QtCore.Qt.UserRole + 1
 
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
     add_task_requested = QtCore.Signal(str)
+    complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
@@ -36,6 +37,10 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                 remove_snooze_action.triggered.connect(
                         lambda: self.remove_snooze_requested.emit(task))
                 context_menu.addAction(remove_snooze_action)
+            complete_action = QtWidgets.QAction("Complete")
+            complete_action.triggered.connect(
+                    lambda: self.complete_task_requested.emit(task))
+            context_menu.addAction(complete_action)
             delete_action = QtWidgets.QAction("Delete")
             delete_action.triggered.connect(
                     lambda: self.delete_task_requested.emit(task))
