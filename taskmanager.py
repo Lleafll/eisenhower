@@ -44,6 +44,18 @@ class TaskManager:
         new_task = replace(task, name=new_name)
         _replace(tasks, task, new_task)
 
+    def is_undoable(self) -> bool:
+        return self._history.has_past()
+
+    def is_redoable(self) -> bool:
+        return self._history.has_future()
+
+    def undo(self) -> None:
+        self._history.go_back_in_time()
+
+    def redo(self) -> None:
+        self._history.go_forward_in_time()
+
 
 def _delete(tasks: Tasks, task: Task) -> None:
     for task_list in tasks.values():
