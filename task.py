@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import date
 from typing import Optional, Sequence, Tuple, List
-from itertools import filterfalse
 
 
 @dataclass(frozen=True)
@@ -9,6 +8,7 @@ class Task:
     name: str
     due: Optional[date] = None
     snooze: Optional[date] = None
+    completed: Optional[date] = None
 
 
 def has_due_date(task: Task) -> bool:
@@ -21,14 +21,24 @@ def has_snoozed_date(task: Task) -> bool:
     return task.snooze > date.today()
 
 
+def is_completed(task: Task) -> bool:
+    return task.completed is not None
+
+
 def sort_tasks_by_relevance(
-        tasks: Sequence[Task]) -> Tuple[List[Task], List[Task], List[Task]]:
-    due_tasks = sorted(
-            filterfalse(has_snoozed_date, filter(has_due_date, tasks)),
-            key=lambda task: task.due)
-    normal_tasks = list(
-            filterfalse(has_snoozed_date, filterfalse(has_due_date, tasks)))
-    snoozed_tasks = sorted(
-            filter(has_snoozed_date, tasks),
-            key=lambda task: task.snooze)
-    return due_tasks, normal_tasks, snoozed_tasks
+        tasks: Sequence[Task]) -> \
+                Tuple[List[Task], List[Task], List[Task], List[Task]]:
+    completed_tasks: List[Task] = []
+    snoozed_tasks: List[Task] = []
+    due_tasks: List[Task] = []
+    normal_tasks: List[Task] = []
+    for task in tasks:
+        if is_completed(task):
+            completed_tasks.append(task)
+        elif has_snoozed_date(task):
+            snoozed_tasks.append(task)
+        elif has_due_date(task):
+            due_tasks.append(task)
+        else:
+            normal_tasks.append(task)
+    return due_tasks, normal_tasks, snoozed_tasks, completed_tasks

@@ -24,6 +24,10 @@ class TaskManager:
         tasks = self._history.write_history()
         _delete(tasks, task)
 
+    def set_complete(self, task: Task, is_complete: bool = True) -> None:
+        tasks = self._history.write_history()
+        _complete(tasks, task, is_complete)
+
     def move(self, task: Task, priority: Priority) -> None:
         tasks = self._history.write_history()
         _delete(tasks, task)
@@ -64,6 +68,17 @@ def _delete(tasks: Tasks, task: Task) -> None:
             break
         except ValueError:
             pass
+
+
+def _complete(tasks: Tasks, old_task: Task, is_complete: bool) -> None:
+    for task_list in tasks.values():
+        for i, task in enumerate(task_list):
+            if task == old_task:
+                if is_complete:
+                    task_list[i] = replace(task, completed=date.today())
+                else:
+                    task_list[i] = replace(task, completed=None)
+                break
 
 
 def _add(tasks: Tasks, task: Task, priority: Priority) -> None:
