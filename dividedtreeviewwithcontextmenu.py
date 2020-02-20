@@ -1,7 +1,8 @@
-from treeviewwithcontextmenu import TreeViewWithContextMenu, TASK_ROLE
+from treeviewwithcontextmenu import (
+        TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model)
 from PySide2 import QtWidgets, QtCore, QtGui
-from task import Task, has_snoozed_date, sort_tasks_by_relevance
-from typing import Sequence, Optional, Tuple
+from task import Task, sort_tasks_by_relevance
+from typing import Sequence
 from datetime import date
 
 
@@ -77,9 +78,9 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     def add_tasks(self, tasks: Sequence[Task]) -> None:
         due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \
                 sort_tasks_by_relevance(tasks)
-        upper_model = _build_tree_view_model(due_tasks + normal_tasks)
+        upper_model = build_tree_view_model(due_tasks + normal_tasks)
         self._upper_list.setModel(upper_model)
-        lower_model = _build_tree_view_model(snoozed_tasks)
+        lower_model = build_tree_view_model(snoozed_tasks)
         self._lower_list.setModel(lower_model)
         upper_model.itemChanged.connect(self._item_changed)
         lower_model.itemChanged.connect(self._item_changed)
@@ -100,39 +101,3 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         elif column == 2:
             snoozed = item.data(QtCore.Qt.DisplayRole)
             self.snooze_task_requested.emit(task, snoozed)
-
-
-def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:
-    if task_date is None:
-        return QtCore.QDate()
-    if isinstance(task_date, QtCore.QDate):
-        return task_date
-    return QtCore.QDate(task_date.year, task_date.month, task_date.day)
-
-
-def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
-    qdate = _date_to_qdate(date)
-    item = QtGui.QStandardItem()
-    item.setData(qdate, QtCore.Qt.DisplayRole)
-    return item
-
-
-def _build_row(task: Task) -> Tuple[QtGui.QStandardItem, ...]:
-    name_item = QtGui.QStandardItem(task.name)
-    due_item = _build_date_item(task.due)
-    snoozed_item = _build_date_item(
-            task.snooze if has_snoozed_date(task) else None)
-    items = (name_item, due_item, snoozed_item)
-    for item in items:
-        item.setData(task, role=TASK_ROLE)
-    return items
-
-
-def _build_tree_view_model(
-        tasks: Sequence[Task]) -> QtGui.QStandardItemModel:
-    model = QtGui.QStandardItemModel()
-    model.setHorizontalHeaderLabels(("Name", "Due", "Snoozed"))
-    for task in tasks:
-        row = _build_row(task)
-        model.appendRow(row)
-    return model
