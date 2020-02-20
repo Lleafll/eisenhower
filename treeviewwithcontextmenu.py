@@ -33,7 +33,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.header().setSectionResizeMode(
-                QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.header().setStretchLastSection(False)
         self.customContextMenuRequested.connect(self._open_context_menu)
 
@@ -45,34 +45,36 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         context_menu = QtWidgets.QMenu()
         if index.isValid():
             task = index.data(TASK_ROLE)
-            if has_due_date(task):
+            if has_due_date(task) and Column.Due in self._displayed_columns:
                 remove_due_action = QtWidgets.QAction("Remove Due")
                 remove_due_action.triggered.connect(
-                        lambda: self.remove_due_requested.emit(task))
+                    lambda: self.remove_due_requested.emit(task))
                 context_menu.addAction(remove_due_action)
-            if has_snoozed_date(task):
+            if has_snoozed_date(
+                    task) and Column.Snoozed in self._displayed_columns:
                 remove_snooze_action = QtWidgets.QAction("Remove Snooze")
                 remove_snooze_action.triggered.connect(
-                        lambda: self.remove_snooze_requested.emit(task))
+                    lambda: self.remove_snooze_requested.emit(task))
                 context_menu.addAction(remove_snooze_action)
             if is_completed(task):
-                unarchive_action = QtWidgets.QAction("Unarchive")
-                unarchive_action.triggered.connect(
+                if Column.Archived in self._displayed_columns:
+                    unarchive_action = QtWidgets.QAction("Unarchive")
+                    unarchive_action.triggered.connect(
                         lambda: self.unarchive_task_requested.emit(task))
-                context_menu.addAction(unarchive_action)
+                    context_menu.addAction(unarchive_action)
             else:
                 complete_action = QtWidgets.QAction("Complete")
                 complete_action.triggered.connect(
-                        lambda: self.complete_task_requested.emit(task))
+                    lambda: self.complete_task_requested.emit(task))
                 context_menu.addAction(complete_action)
             delete_action = QtWidgets.QAction("Delete")
             delete_action.triggered.connect(
-                    lambda: self.delete_task_requested.emit(task))
+                lambda: self.delete_task_requested.emit(task))
             context_menu.addAction(delete_action)
         else:
             add_task_action = QtWidgets.QAction("Add Task")
             add_task_action.triggered.connect(
-                    lambda: self.add_task_requested.emit("New Task"))
+                lambda: self.add_task_requested.emit("New Task"))
             context_menu.addAction(add_task_action)
         context_menu.exec_(self.viewport().mapToGlobal(point))
 
@@ -103,7 +105,7 @@ def _build_row(
             item = _build_date_item(task.due)
         elif column == Column.Snoozed:
             item = _build_date_item(
-                    task.snooze if has_snoozed_date(task) else None)
+                task.snooze if has_snoozed_date(task) else None)
         elif column == Column.Archived:
             item = _build_date_item(task.completed)
             item.setEditable(False)
