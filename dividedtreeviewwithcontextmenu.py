@@ -86,8 +86,10 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         lower_model = build_tree_view_model(
                 self._lower_list.columns(), snoozed_tasks)
         self._lower_list.setModel(lower_model)
-        upper_model.itemChanged.connect(self._item_changed)
-        lower_model.itemChanged.connect(self._item_changed)
+        upper_model.itemChanged.connect(
+                lambda item: self._item_changed(self._upper_list, item))
+        lower_model.itemChanged.connect(
+                lambda item: self._item_changed(self._lower_list, item))
         self._upper_list.setItemDelegateForColumn(1, CalendarDelegate(self))
         self._upper_list.setItemDelegateForColumn(2, CalendarDelegate(self))
         self._lower_list.setItemDelegateForColumn(1, CalendarDelegate(self))
