@@ -101,6 +101,12 @@ def load_task_manager(import_path: Path) -> TaskManager:
             task_manager = load(file)
     except FileNotFoundError:
         task_manager = TaskManager()
+    for time_point in task_manager._history._tasks:
+        for tasks in time_point.values():
+            for i, task in enumerate(tasks):
+                if not hasattr(task, "notes"):
+                    tasks[i] = Task(
+                            task.name, task.due, task.snooze, task.completed)
     return task_manager
 
 

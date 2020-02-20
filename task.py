@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from typing import Optional, Sequence, Tuple, List
 
@@ -9,6 +9,7 @@ class Task:
     due: Optional[date] = None
     snooze: Optional[date] = None
     completed: Optional[date] = None
+    notes: List[str] = field(default_factory=list)
 
 
 def has_due_date(task: Task) -> bool:

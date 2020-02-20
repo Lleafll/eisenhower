@@ -22,6 +22,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     delete_task_requested = QtCore.Signal(Task)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
+    show_notes_requested = QtCore.Signal(Task)
 
     def __init__(
             self,
@@ -60,6 +61,10 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                 remove_snooze_action.triggered.connect(
                     lambda: self.remove_snooze_requested.emit(task))
                 context_menu.addAction(remove_snooze_action)
+            notes_action = QtWidgets.QAction("Show Notes")
+            notes_action.triggered.connect(
+                    lambda: self.show_notes_requested.emit(task))
+            context_menu.addAction(notes_action)
             if is_completed(task):
                 if Column.Archived in self._displayed_columns:
                     unarchive_action = QtWidgets.QAction("Unarchive")

@@ -9,6 +9,7 @@ from datetime import date
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, build_tree_view_model, Column)
+from notesviewqt import NotesViewQt
 
 
 @dataclass(frozen=True)
@@ -49,6 +50,7 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.snooze_task_requested.connect(self._set_snooze)
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
+            task_list.show_notes_requested.connect(self._show_notes)
         self._undo_button.clicked.connect(self._undo)
         self._redo_button.clicked.connect(self._redo)
         self._show_archive_button.clicked.connect(self._show_archive)
@@ -180,3 +182,10 @@ class MainWindowQt(QtWidgets.QWidget):
             return
         self._task_manager.instance.set_complete(task, False)
         self._update_and_save()
+
+    def _show_notes(self, task: Task) -> None:
+        if self._task_manager is None:
+            return
+        notes_view = NotesViewQt(task, self)
+        notes_view.setWindowFlag(QtGui.Qt.Window)
+        notes_view.show()
