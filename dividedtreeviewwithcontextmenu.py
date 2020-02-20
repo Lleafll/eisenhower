@@ -1,5 +1,5 @@
 from treeviewwithcontextmenu import (
-        TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model)
+        TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import Task, sort_tasks_by_relevance
 from typing import Sequence
@@ -62,8 +62,10 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
 
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
-        self._upper_list = TreeViewWithContextMenu(self)
-        self._lower_list = TreeViewWithContextMenu(self)
+        self._upper_list = TreeViewWithContextMenu(
+                (Column.Name, Column.Due), self)
+        self._lower_list = TreeViewWithContextMenu(
+                (Column.Name, Column.Due, Column.Snoozed), self)
         layout = QtWidgets.QVBoxLayout(self)
         for task_list in (self._upper_list, self._lower_list):
             layout.addWidget(task_list)
@@ -78,9 +80,11 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     def add_tasks(self, tasks: Sequence[Task]) -> None:
         due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \
                 sort_tasks_by_relevance(tasks)
-        upper_model = build_tree_view_model(due_tasks + normal_tasks)
+        upper_model = build_tree_view_model(
+                self._upper_list.columns(), due_tasks + normal_tasks)
         self._upper_list.setModel(upper_model)
-        lower_model = build_tree_view_model(snoozed_tasks)
+        lower_model = build_tree_view_model(
+                self._lower_list.columns(), snoozed_tasks)
         self._lower_list.setModel(lower_model)
         upper_model.itemChanged.connect(self._item_changed)
         lower_model.itemChanged.connect(self._item_changed)
@@ -89,15 +93,19 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         self._lower_list.setItemDelegateForColumn(1, CalendarDelegate(self))
         self._lower_list.setItemDelegateForColumn(2, CalendarDelegate(self))
 
-    def _item_changed(self, item: QtGui.QStandardItem) -> None:
+    def _item_changed(
+            self,
+            task_list: TreeViewWithContextMenu,
+            item: QtGui.QStandardItem) -> None:
         task = item.data(TASK_ROLE)
-        column = item.column()
-        if column == 0:
+        column_index = item.column()
+        column = task_list.columns()[column_index]
+        if column == Column.Name:
             new_name = item.data(QtCore.Qt.DisplayRole)
             self.rename_task_requested.emit(task, new_name)
-        elif column == 1:
+        elif column == Column.Due:
             due = item.data(QtCore.Qt.DisplayRole)
             self.schedule_task_requested.emit(task, due)
-        elif column == 2:
+        elif column == Column.Snoozed:
             snoozed = item.data(QtCore.Qt.DisplayRole)
             self.snooze_task_requested.emit(task, snoozed)

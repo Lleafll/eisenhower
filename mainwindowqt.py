@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from datetime import date
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 from treeviewwithcontextmenu import (
-        TreeViewWithContextMenu, build_tree_view_model)
+        TreeViewWithContextMenu, build_tree_view_model, Column)
 
 
 @dataclass(frozen=True)
@@ -52,7 +52,8 @@ class MainWindowQt(QtWidgets.QWidget):
         self._undo_button.clicked.connect(self._undo)
         self._redo_button.clicked.connect(self._redo)
         self._show_archive_button.clicked.connect(self._show_archive)
-        self._archive_view = TreeViewWithContextMenu(self)
+        self._archive_view = TreeViewWithContextMenu(
+                (Column.Name, Column.Archived), self)
         self._archive_view.setWindowFlag(QtGui.Qt.Window)
         self._archive_view.setWindowTitle("Task Archive")
         self._archive_view.hide()
@@ -104,7 +105,8 @@ class MainWindowQt(QtWidgets.QWidget):
                 priority_tasks = self._task_manager.instance.tasks(priority)
                 archived_priority_tasks = filter(is_completed, priority_tasks)
                 archived_tasks.extend(archived_priority_tasks)
-            archive_model = build_tree_view_model(archived_tasks)
+            archive_model = build_tree_view_model(
+                    self._archive_view.columns(), archived_tasks)
             self._archive_view.setModel(archive_model)
             self._undo_button.show()
             self._redo_button.show()

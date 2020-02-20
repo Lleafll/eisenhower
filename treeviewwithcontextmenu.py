@@ -1,10 +1,18 @@
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import Task, has_due_date, has_snoozed_date, is_completed
-from typing import Optional, Tuple, Iterable
+from typing import Optional, Iterable, Sequence
 from datetime import date
+from enum import Enum, auto
 
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
+
+
+class Column(Enum):
+    Name = auto()
+    Due = auto()
+    Snoozed = auto()
+    Archived = auto()
 
 
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
@@ -15,8 +23,12 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
 
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
+    def __init__(
+            self,
+            displayed_columns: Sequence[Column],
+            parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
+        self._displayed_columns = displayed_columns
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -24,6 +36,9 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                 QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.header().setStretchLastSection(False)
         self.customContextMenuRequested.connect(self._open_context_menu)
+
+    def columns(self) -> Sequence[Column]:
+        return self._displayed_columns
 
     def _open_context_menu(self, point: QtCore.QPoint) -> None:
         index = self.indexAt(point)
@@ -77,24 +92,48 @@ def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
     return item
 
 
-def _build_row(task: Task) -> Tuple[QtGui.QStandardItem, ...]:
-    name_item = QtGui.QStandardItem(task.name)
-    due_item = _build_date_item(task.due)
-    snoozed_item = _build_date_item(
-            task.snooze if has_snoozed_date(task) else None)
-    archived_item = _build_date_item(task.completed)
-    archived_item.setEditable(False)
-    items = (name_item, due_item, snoozed_item, archived_item)
-    for item in items:
+def _build_row(
+        task: Task,
+        columns: Sequence[Column]) -> Sequence[QtGui.QStandardItem]:
+    items = []
+    for column in columns:
+        if column == Column.Name:
+            item = QtGui.QStandardItem(task.name)
+        elif column == Column.Due:
+            item = _build_date_item(task.due)
+        elif column == Column.Snoozed:
+            item = _build_date_item(
+                    task.snooze if has_snoozed_date(task) else None)
+        elif column == Column.Archived:
+            item = _build_date_item(task.completed)
+            item.setEditable(False)
+        else:
+            raise RuntimeError("Unhandled column")
         item.setData(task, role=TASK_ROLE)
+        items.append(item)
     return items
 
 
+def _set_rows(
+        model: QtGui.QStandardItemModel,
+        columns: Sequence[Column],
+        tasks: Iterable[Task]) -> None:
+    for task in tasks:
+        row = _build_row(task, columns)
+        model.appendRow(row)
+
+
+def _set_header(
+        model: QtGui.QStandardItemModel,
+        columns: Sequence[Column]) -> None:
+    header_labels = list([column.name for column in columns])
+    model.setHorizontalHeaderLabels(header_labels)
+
+
 def build_tree_view_model(
+        columns: Sequence[Column],
         tasks: Iterable[Task]) -> QtGui.QStandardItemModel:
     model = QtGui.QStandardItemModel()
-    model.setHorizontalHeaderLabels(("Name", "Due", "Snoozed", "Archived"))
-    for task in tasks:
-        row = _build_row(task)
-        model.appendRow(row)
+    _set_header(model, columns)
+    _set_rows(model, columns, tasks)
     return model
