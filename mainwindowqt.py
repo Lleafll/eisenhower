@@ -56,6 +56,7 @@ class MainWindowQt(QtWidgets.QWidget):
                 (Column.Name, Column.Archived), self)
         self._archive_view.setWindowFlag(QtGui.Qt.Window)
         self._archive_view.setWindowTitle("Task Archive")
+        self._archive_view.show_add_task_in_context_menu(False)
         self._archive_view.hide()
         self._do_list.add_task_requested.connect(
                 lambda text: self._add_task(text, Priority.do))
