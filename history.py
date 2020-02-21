@@ -1,10 +1,9 @@
 from task import Task
-from typing import DefaultDict, List
-from priority import Priority
+from typing import List
 from copy import deepcopy
 
 
-Tasks = DefaultDict[Priority, List[Task]]
+Tasks = List[Task]
 
 
 class HistoryError(RuntimeError):
