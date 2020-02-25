@@ -63,7 +63,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
         self._upper_list = TreeViewWithContextMenu(
-                (Column.Name, Column.Due), self)
+                (Column.Name, Column.Due, Column.Snoozed), self)
         self._lower_list = TreeViewWithContextMenu(
                 (Column.Name, Column.Due, Column.Snoozed), self)
         layout = QtWidgets.QVBoxLayout(self)
