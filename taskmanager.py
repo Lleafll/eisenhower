@@ -1,24 +1,22 @@
-from task import Task
-from typing import Sequence, Optional
+from task import Task, Importance, DueDate
+from typing import Optional
 from datetime import date
 from dataclasses import replace
 from pickle import load, dump
 from pathlib import Path
 from history import History, Tasks
-from priority import Priority
-from collections import defaultdict
 
 
 class TaskManager:
-    def __init__(self, tasks: Tasks = defaultdict(list)) -> None:
+    def __init__(self, tasks: Tasks = []) -> None:
         self._history = History(tasks)
 
-    def tasks(self, priority: Priority) -> Sequence[Task]:
-        return self._history.present()[priority]
+    def tasks(self) -> Tasks:
+        return self._history.present()
 
-    def add(self, task: Task, priority: Priority) -> None:
+    def add(self, task: Task) -> None:
         tasks = self._history.write_history()
-        _add(tasks, task, priority)
+        tasks.append(task)
 
     def delete(self, task: Task) -> None:
         tasks = self._history.write_history()
@@ -28,12 +26,7 @@ class TaskManager:
         tasks = self._history.write_history()
         _complete(tasks, task, is_complete)
 
-    def move(self, task: Task, priority: Priority) -> None:
-        tasks = self._history.write_history()
-        _delete(tasks, task)
-        _add(tasks, task, priority)
-
-    def schedule(self, task: Task, due: Optional[date]) -> None:
+    def schedule(self, task: Task, due: Optional[DueDate]) -> None:
         tasks = self._history.write_history()
         new_task = replace(task, due=due)
         _replace(tasks, task, new_task)
@@ -46,6 +39,11 @@ class TaskManager:
     def rename(self, task: Task, new_name: str) -> None:
         tasks = self._history.write_history()
         new_task = replace(task, name=new_name)
+        _replace(tasks, task, new_task)
+
+    def set_importance(self, task: Task, importance: Importance) -> None:
+        tasks = self._history.write_history()
+        new_task = replace(task, importance=importance)
         _replace(tasks, task, new_task)
 
     def is_undoable(self) -> bool:
@@ -62,48 +60,39 @@ class TaskManager:
 
 
 def _delete(tasks: Tasks, task: Task) -> None:
-    for task_list in tasks.values():
-        try:
-            task_list.remove(task)
-            break
-        except ValueError:
-            pass
+    try:
+        tasks.remove(task)
+    except ValueError:
+        pass
 
 
 def _complete(tasks: Tasks, old_task: Task, is_complete: bool) -> None:
-    for task_list in tasks.values():
-        for i, task in enumerate(task_list):
-            if task == old_task:
-                if is_complete:
-                    task_list[i] = replace(task, completed=date.today())
-                else:
-                    task_list[i] = replace(task, completed=None)
-                break
-
-
-def _add(tasks: Tasks, task: Task, priority: Priority) -> None:
-    tasks[priority].append(task)
+    for i, task in enumerate(tasks):
+        if task == old_task:
+            if is_complete:
+                tasks[i] = replace(task, completed=date.today())
+            else:
+                tasks[i] = replace(task, completed=None)
+            break
 
 
 def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
-    for task_list in tasks.values():
-        try:
-            index = task_list.index(old_task)
-            task_list[index] = new_task
-            break
-        except ValueError:
-            pass
+    try:
+        index = tasks.index(old_task)
+        tasks[index] = new_task
+    except ValueError:
+        pass
 
 
 def load_task_manager(import_path: Path) -> TaskManager:
     try:
         with open(import_path, "rb") as file:
-            task_manager = load(file)
+            tasks: Tasks = load(file)
     except FileNotFoundError:
-        task_manager = TaskManager()
-    return task_manager
+        tasks = []
+    return TaskManager(tasks)
 
 
 def save_task_manager(export_path: Path, task_manager: TaskManager) -> None:
     with open(export_path, "wb") as file:
-        return dump(task_manager, file)
+        return dump(task_manager.tasks(), file)
