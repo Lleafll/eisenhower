@@ -1,14 +1,22 @@
 from PySide2 import QtWidgets, QtGui
-from task import Task, is_completed
+from task import (
+        Task,
+        is_completed,
+        has_due_date,
+        is_important,
+        Importance,
+        DueDate,
+        Immediate)
 from taskmanager import (
-        TaskManager, load_task_manager, save_task_manager, Priority)
-from typing import Optional, List
+        TaskManager, load_task_manager, save_task_manager)
+from typing import Optional
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import date
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, build_tree_view_model, Column)
+from itertools import filterfalse
 
 
 @dataclass(frozen=True)
@@ -37,10 +45,14 @@ class MainWindowQt(QtWidgets.QWidget):
         self._do_list = SeparatedTreeViewWithContextMenu(self)
         self._decide_list = SeparatedTreeViewWithContextMenu(self)
         self._delegate_list = SeparatedTreeViewWithContextMenu(self)
+        self._drop_list = SeparatedTreeViewWithContextMenu(self)
         task_layout = QtWidgets.QHBoxLayout()
         layout.addLayout(task_layout)
         for task_list in (
-                self._do_list, self._decide_list, self._delegate_list):
+                self._do_list,
+                self._decide_list,
+                self._delegate_list,
+                self._drop_list):
             task_layout.addWidget(task_list)
             task_list.complete_task_requested.connect(self._complete_task)
             task_list.delete_task_requested.connect(self._delete_task)
@@ -49,6 +61,9 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.snooze_task_requested.connect(self._set_snooze)
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
+            task_list.add_task_requested.connect(self._add_task)
+            task_list.set_immediate_requested.connect(
+                    lambda task: self._set_due(task, Immediate))
         self._undo_button.clicked.connect(self._undo)
         self._redo_button.clicked.connect(self._redo)
         self._show_archive_button.clicked.connect(self._show_archive)
@@ -58,12 +73,6 @@ class MainWindowQt(QtWidgets.QWidget):
         self._archive_view.setWindowTitle("Task Archive")
         self._archive_view.show_add_task_in_context_menu(False)
         self._archive_view.hide()
-        self._do_list.add_task_requested.connect(
-                lambda text: self._add_task(text, Priority.do))
-        self._decide_list.add_task_requested.connect(
-                lambda text: self._add_task(text, Priority.decide))
-        self._delegate_list.add_task_requested.connect(
-                lambda text: self._add_task(text, Priority.delegate))
         self._archive_view.delete_task_requested.connect(self._delete_task)
         self._archive_view.unarchive_task_requested.connect(
                 self._unarchive_task)
@@ -90,22 +99,22 @@ class MainWindowQt(QtWidgets.QWidget):
             self._do_list.hide()
             self._decide_list.hide()
             self._delegate_list.hide()
+            self._drop_list.hide()
             self._undo_button.hide()
             self._redo_button.hide()
             self._show_archive_button.hide()
         else:
-            for priority, task_list in (
-                    (Priority.do, self._do_list),
-                    (Priority.decide, self._decide_list),
-                    (Priority.delegate, self._delegate_list)):
+            tasks = self._task_manager.instance.tasks()
+            non_archived_tasks = list(filterfalse(is_completed, tasks))
+            archived_tasks = filter(is_completed, tasks)
+            for filter_func, task_list in (
+                    (_is_do_task, self._do_list),
+                    (_is_decide_task, self._decide_list),
+                    (_is_delegate_task, self._delegate_list),
+                    (_is_drop_task, self._drop_list)):
                 task_list.show()
-                tasks = self._task_manager.instance.tasks(priority)
-                task_list.add_tasks(tasks)
-            archived_tasks: List[Task] = []
-            for priority in Priority:
-                priority_tasks = self._task_manager.instance.tasks(priority)
-                archived_priority_tasks = filter(is_completed, priority_tasks)
-                archived_tasks.extend(archived_priority_tasks)
+                task_list_tasks = list(filter(filter_func, non_archived_tasks))
+                task_list.add_tasks(task_list_tasks)
             archive_model = build_tree_view_model(
                     self._archive_view.columns(), archived_tasks)
             self._archive_view.setModel(archive_model)
@@ -123,11 +132,11 @@ class MainWindowQt(QtWidgets.QWidget):
         save_task_manager(self._task_manager.path, self._task_manager.instance)
         self._update()
 
-    def _add_task(self, task_name: str, priority: Priority) -> None:
+    def _add_task(self, task_name: str) -> None:
         if self._task_manager is None:
             return
-        task = Task(task_name)
-        self._task_manager.instance.add(task, priority)
+        task = Task(task_name, Importance.Important)
+        self._task_manager.instance.add(task)
         self._update_and_save()
 
     def _complete_task(self, task: Task) -> None:
@@ -148,7 +157,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.rename(task, name)
         self._update_and_save()
 
-    def _set_due(self, task: Task, due: Optional[date] = None) -> None:
+    def _set_due(self, task: Task, due: Optional[DueDate] = None) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.schedule(task, due)
@@ -180,3 +189,19 @@ class MainWindowQt(QtWidgets.QWidget):
             return
         self._task_manager.instance.set_complete(task, False)
         self._update_and_save()
+
+
+def _is_do_task(task: Task) -> bool:
+    return is_important(task) and has_due_date(task)
+
+
+def _is_decide_task(task: Task) -> bool:
+    return is_important(task) and (not has_due_date(task))
+
+
+def _is_delegate_task(task: Task) -> bool:
+    return (not is_important(task)) and has_due_date(task)
+
+
+def _is_drop_task(task: Task) -> bool:
+    return (not is_important(task)) and (not has_due_date(task))

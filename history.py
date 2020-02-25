@@ -1,10 +1,9 @@
 from task import Task
-from typing import DefaultDict, List
-from priority import Priority
-from copy import deepcopy
+from typing import List
+from copy import copy
 
 
-Tasks = DefaultDict[Priority, List[Task]]
+Tasks = List[Task]
 
 
 class HistoryError(RuntimeError):
@@ -38,7 +37,8 @@ class History:
         return self.present()
 
     def write_history(self) -> Tasks:
-        new_present = deepcopy(self.present())
+        # No deep copy necessary, all elements are immutable
+        new_present = copy(self.present())
         self._current += 1
         del self._tasks[self._current:]
         self._tasks.append(new_present)

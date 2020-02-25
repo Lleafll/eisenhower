@@ -1,5 +1,6 @@
 from PySide2 import QtWidgets, QtCore, QtGui
-from task import Task, has_due_date, has_snoozed_date, is_completed
+from task import (
+        Task, has_due_date, has_snoozed_date, is_completed, Immediate, DueDate)
 from typing import Optional, Iterable, Sequence
 from datetime import date
 from enum import Enum, auto
@@ -18,6 +19,7 @@ class Column(Enum):
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
     add_task_requested = QtCore.Signal(str)
     complete_task_requested = QtCore.Signal(Task)
+    set_immediate_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
     remove_due_requested = QtCore.Signal(Task)
@@ -49,11 +51,17 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         context_menu = QtWidgets.QMenu()
         if index.isValid():
             task = index.data(TASK_ROLE)
-            if has_due_date(task) and Column.Due in self._displayed_columns:
-                remove_due_action = QtWidgets.QAction("Remove Due")
-                remove_due_action.triggered.connect(
-                    lambda: self.remove_due_requested.emit(task))
-                context_menu.addAction(remove_due_action)
+            if Column.Due in self._displayed_columns:
+                if has_due_date(task):
+                    remove_due_action = QtWidgets.QAction("Remove Due")
+                    remove_due_action.triggered.connect(
+                        lambda: self.remove_due_requested.emit(task))
+                    context_menu.addAction(remove_due_action)
+                if task.due is not Immediate:
+                    set_immediate_action = QtWidgets.QAction("Set Immediate")
+                    set_immediate_action.triggered.connect(
+                        lambda: self.set_immediate_requested.emit(task))
+                    context_menu.addAction(set_immediate_action)
             if has_snoozed_date(
                     task) and Column.Snoozed in self._displayed_columns:
                 remove_snooze_action = QtWidgets.QAction("Remove Snooze")
@@ -100,6 +108,13 @@ def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
     return item
 
 
+def _build_due_date_item(date: Optional[DueDate]) -> QtGui.QStandardItem:
+    if date is Immediate:
+        return _build_date_item(None)
+    else:
+        return _build_date_item(date)  # type: ignore
+
+
 def _build_row(
         task: Task,
         columns: Sequence[Column]) -> Sequence[QtGui.QStandardItem]:
@@ -108,7 +123,7 @@ def _build_row(
         if column == Column.Name:
             item = QtGui.QStandardItem(task.name)
         elif column == Column.Due:
-            item = _build_date_item(task.due)
+            item = _build_due_date_item(task.due)
         elif column == Column.Snoozed:
             item = _build_date_item(
                 task.snooze if has_snoozed_date(task) else None)

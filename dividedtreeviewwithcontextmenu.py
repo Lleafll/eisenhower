@@ -56,6 +56,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     delete_task_requested = QtCore.Signal(Task)
     rename_task_requested = QtCore.Signal(Task, str)
     schedule_task_requested = QtCore.Signal(Task, date)
+    set_immediate_requested = QtCore.Signal(Task)
     snooze_task_requested = QtCore.Signal(Task, date)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
@@ -76,6 +77,8 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list.remove_due_requested.connect(self.remove_due_requested)
             task_list.remove_snooze_requested.connect(
                     self.remove_snooze_requested)
+            task_list.set_immediate_requested.connect(
+                    self.set_immediate_requested)
 
     def add_tasks(self, tasks: Sequence[Task]) -> None:
         due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \

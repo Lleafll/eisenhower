@@ -1,12 +1,28 @@
 from dataclasses import dataclass
 from datetime import date
-from typing import Optional, Sequence, Tuple, List
+from typing import Optional, Iterable, Tuple, List, Union
+from enum import Enum, auto
+
+
+class Importance(Enum):
+    Important = auto()
+    Unimportant = auto()
+
+
+@dataclass(frozen=True)
+class ImmediateType:
+    pass
+
+
+Immediate = ImmediateType()
+DueDate = Union[date, ImmediateType]
 
 
 @dataclass(frozen=True)
 class Task:
     name: str
-    due: Optional[date] = None
+    importance: Importance
+    due: Optional[DueDate] = None
     snooze: Optional[date] = None
     completed: Optional[date] = None
 
@@ -25,8 +41,12 @@ def is_completed(task: Task) -> bool:
     return task.completed is not None
 
 
+def is_important(task: Task) -> bool:
+    return task.importance == Importance.Important
+
+
 def sort_tasks_by_relevance(
-        tasks: Sequence[Task]) -> \
+        tasks: Iterable[Task]) -> \
                 Tuple[List[Task], List[Task], List[Task], List[Task]]:
     completed_tasks: List[Task] = []
     snoozed_tasks: List[Task] = []
