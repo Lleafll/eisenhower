@@ -109,7 +109,7 @@ def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
 
 
 def _build_due_date_item(date: Optional[DueDate]) -> QtGui.QStandardItem:
-    if date is Immediate:
+    if date == Immediate:
         return _build_date_item(None)
     else:
         return _build_date_item(date)  # type: ignore
