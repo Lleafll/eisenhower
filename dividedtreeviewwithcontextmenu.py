@@ -2,7 +2,7 @@ from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import Task, sort_tasks_by_relevance
-from typing import Sequence, Iterable
+from typing import Sequence
 from datetime import date
 
 
@@ -60,6 +60,8 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     snooze_task_requested = QtCore.Signal(Task, date)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
+    set_important_requested = QtCore.Signal(Task)
+    set_unimportant_requested = QtCore.Signal(Task)
 
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
@@ -79,6 +81,10 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
                     self.remove_snooze_requested)
             task_list.set_immediate_requested.connect(
                     self.set_immediate_requested)
+            task_list.set_important_requested.connect(
+                    self.set_important_requested)
+            task_list.set_unimportant_requested.connect(
+                    self.set_unimportant_requested)
 
     def add_tasks(self, tasks: Sequence[Task]) -> None:
         due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \

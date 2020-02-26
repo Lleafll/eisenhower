@@ -1,6 +1,12 @@
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import (
-        Task, has_due_date, has_snoozed_date, is_completed, Immediate, DueDate)
+        Task,
+        has_due_date,
+        has_snoozed_date,
+        is_completed,
+        Immediate,
+        DueDate,
+        Importance)
 from typing import Optional, Iterable, Sequence
 from datetime import date
 from enum import Enum, auto
@@ -24,6 +30,8 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     delete_task_requested = QtCore.Signal(Task)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
+    set_important_requested = QtCore.Signal(Task)
+    set_unimportant_requested = QtCore.Signal(Task)
 
     def __init__(
             self,
@@ -50,7 +58,17 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         index = self.indexAt(point)
         context_menu = QtWidgets.QMenu()
         if index.isValid():
-            task = index.data(TASK_ROLE)
+            task: Task = index.data(TASK_ROLE)
+            if task.importance == Importance.Important:
+                set_unimportant_task = QtWidgets.QAction("Make Unimportant")
+                set_unimportant_task.triggered.connect(
+                        lambda: self.set_unimportant_requested.emit(task))
+                context_menu.addAction(set_unimportant_task)
+            else:
+                set_important_task = QtWidgets.QAction("Make Important")
+                set_important_task.triggered.connect(
+                        lambda: self.set_important_requested.emit(task))
+                context_menu.addAction(set_important_task)
             if Column.Due in self._displayed_columns:
                 if has_due_date(task):
                     remove_due_action = QtWidgets.QAction("Remove Due")
