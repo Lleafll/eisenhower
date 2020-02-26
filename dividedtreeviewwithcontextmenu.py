@@ -2,7 +2,7 @@ from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import Task, sort_tasks_by_relevance
-from typing import Sequence
+from typing import Sequence, Iterable
 from datetime import date
 
 
@@ -83,20 +83,9 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     def add_tasks(self, tasks: Sequence[Task]) -> None:
         due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \
                 sort_tasks_by_relevance(tasks)
-        upper_model = build_tree_view_model(
-                self._upper_list.columns(), due_tasks + normal_tasks)
-        self._upper_list.setModel(upper_model)
-        lower_model = build_tree_view_model(
-                self._lower_list.columns(), snoozed_tasks)
-        self._lower_list.setModel(lower_model)
-        upper_model.itemChanged.connect(
-                lambda item: self._item_changed(self._upper_list, item))
-        lower_model.itemChanged.connect(
-                lambda item: self._item_changed(self._lower_list, item))
-        self._upper_list.setItemDelegateForColumn(1, CalendarDelegate(self))
-        self._upper_list.setItemDelegateForColumn(2, CalendarDelegate(self))
-        self._lower_list.setItemDelegateForColumn(1, CalendarDelegate(self))
-        self._lower_list.setItemDelegateForColumn(2, CalendarDelegate(self))
+        _build_model_and_connect(
+                self._upper_list, due_tasks + normal_tasks, self)
+        _build_model_and_connect(self._lower_list, snoozed_tasks, self)
 
     def _item_changed(
             self,
@@ -114,3 +103,14 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         elif column == Column.Snoozed:
             snoozed = item.data(QtCore.Qt.DisplayRole)
             self.snooze_task_requested.emit(task, snoozed)
+
+
+def _build_model_and_connect(
+        task_list: TreeViewWithContextMenu,
+        tasks: Sequence[Task],
+        view: SeparatedTreeViewWithContextMenu) -> None:
+    model = build_tree_view_model(task_list.columns(), tasks)
+    task_list.setModel(model)
+    model.itemChanged.connect(lambda item: view._item_changed(task_list, item))
+    task_list.setItemDelegateForColumn(1, CalendarDelegate(task_list))
+    task_list.setItemDelegateForColumn(2, CalendarDelegate(task_list))
