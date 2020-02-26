@@ -4,7 +4,6 @@ from task import (
         is_completed,
         has_due_date,
         is_important,
-        Importance,
         DueDate,
         Immediate)
 from taskmanager import (
@@ -17,6 +16,7 @@ from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, build_tree_view_model, Column)
 from itertools import filterfalse
+from taskcreatordialog import TaskCreatorDialogQt
 
 
 @dataclass(frozen=True)
@@ -135,7 +135,9 @@ class MainWindowQt(QtWidgets.QWidget):
     def _add_task(self, task_name: str) -> None:
         if self._task_manager is None:
             return
-        task = Task(task_name, Importance.Important)
+        task = TaskCreatorDialogQt.askNewTask(self)
+        if task is None:
+            return
         self._task_manager.instance.add(task)
         self._update_and_save()
 
