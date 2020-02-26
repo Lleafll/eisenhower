@@ -38,7 +38,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         layout = QtWidgets.QFormLayout(self)
         layout.setSizeConstraint(QtWidgets.QLayout.SetFixedSize)
         layout.addRow("Name", self._name_widget)
-        layout.addRow("Important", importance_buttons_box)
+        layout.addRow("Importance", importance_buttons_box)
         layout.addRow("Due", due_buttons_box)
         layout.addRow("", self._due_date_widget)
         layout.addRow(buttons)
