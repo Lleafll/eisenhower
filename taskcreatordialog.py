@@ -49,7 +49,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
     def task(self) -> Task:
         name: str = self._name_widget.text()
         importance: Importance = Importance.Important \
-            if self._importance_widget.isChecked() else Importance.Unimportant
+            if self._important_button.isChecked() else Importance.Unimportant
         if self._no_due_button.isChecked():
             due: Optional[DueDate] = None
         elif self._immediate_due_button.isChecked():
