@@ -55,7 +55,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         elif self._immediate_due_button.isChecked():
             due = Immediate
         else:
-            due = self._due_widget.selectedDate()
+            due = self._due_date_widget.selectedDate()
         return Task(name, importance, due)
 
     @staticmethod
