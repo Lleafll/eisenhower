@@ -50,6 +50,41 @@ class CalendarDelegate(QtWidgets.QItemDelegate):
         model.setData(index, date)
 
 
+class ItemWordWrap(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
+        super().__init__(parent)
+        self.parent = parent
+
+    def paint(
+            self,
+            painter: QtGui.QPainter,
+            option: QtWidgets.QStyleOption,
+            index: QtCore.QModelIndex) -> None:
+        text = index.model().data(index)
+        document = QtGui.QTextDocument()
+        document.setHtml(text)
+        document.setTextWidth(option.rect.width())
+        index.model().setData(index, option.rect.width(), QtCore.Qt.UserRole+1)
+        painter.save()
+        painter.translate(option.rect.x(), option.rect.y())
+        document.drawContents(painter)
+        painter.restore()
+
+    def sizeHint(
+            self,
+            option: QtWidgets.QStyleOption,
+            index: QtCore.QModelIndex) -> None:
+        text = index.model().data(index)
+        document = QtGui.QTextDocument()
+        document.setHtml(text)
+        width = index.model().data(index, QtCore.Qt.UserRole+1)
+        if not width:
+            width = 20
+        document.setTextWidth(width)
+        return QtCore.QSize(
+                document.idealWidth() + 10,  document.size().height())
+
+
 class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     add_task_requested = QtCore.Signal(str)
     complete_task_requested = QtCore.Signal(Task)
@@ -125,5 +160,6 @@ def _build_model_and_connect(
         header.resizeSection(i, 80)
     header.setStretchLastSection(False)
     model.itemChanged.connect(lambda item: view._item_changed(task_list, item))
-    task_list.setItemDelegateForColumn(1, CalendarDelegate(task_list))
-    task_list.setItemDelegateForColumn(2, CalendarDelegate(task_list))
+    task_list.setItemDelegateForColumn(0, ItemWordWrap(task_list))
+    for i in (1, 2):
+        task_list.setItemDelegateForColumn(i, CalendarDelegate(task_list))
