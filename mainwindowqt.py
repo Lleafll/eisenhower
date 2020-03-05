@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui
+from PySide2 import QtWidgets, QtGui, QtCore
 from task import (
         Task,
         is_completed,
@@ -47,10 +47,14 @@ class MainWindowQt(QtWidgets.QWidget):
         button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._show_archive_button)
         button_layout.addStretch()
-        self._do_list = SeparatedTreeViewWithContextMenu(self)
-        self._decide_list = SeparatedTreeViewWithContextMenu(self)
-        self._delegate_list = SeparatedTreeViewWithContextMenu(self)
-        self._drop_list = SeparatedTreeViewWithContextMenu(self)
+        self._do_list = SeparatedTreeViewWithContextMenu(
+                "Do", QtGui.QColor(255, 210, 194), self)
+        self._decide_list = SeparatedTreeViewWithContextMenu(
+                "Decide", QtGui.QColor(255, 221, 170), self)
+        self._delegate_list = SeparatedTreeViewWithContextMenu(
+                "Delegate", QtGui.QColor(255, 255, 170), self)
+        self._drop_list = SeparatedTreeViewWithContextMenu(
+                "Drop", QtGui.QColor(181, 255, 170), self)
         task_layout = QtWidgets.QHBoxLayout()
         task_layout.setMargin(0)
         task_layout.setSpacing(5)
@@ -82,7 +86,9 @@ class MainWindowQt(QtWidgets.QWidget):
         self._add_task_button.clicked.connect(self._add_task)
         self._show_archive_button.clicked.connect(self._show_archive)
         self._archive_view = TreeViewWithContextMenu(
-                (Column.Name, Column.Archived), self)
+                (Column.Name, Column.Archived),
+                QtGui.QColor(255, 255, 255),
+                self)
         self._archive_view.setWindowFlag(QtGui.Qt.Window)
         self._archive_view.setWindowTitle("Task Archive")
         self._archive_view.show_add_task_in_context_menu(False)
@@ -127,9 +133,12 @@ class MainWindowQt(QtWidgets.QWidget):
                     (_is_decide_task, self._decide_list),
                     (_is_delegate_task, self._delegate_list),
                     (_is_drop_task, self._drop_list)):
-                task_list.show()
                 task_list_tasks = list(filter(filter_func, non_archived_tasks))
-                task_list.add_tasks(task_list_tasks)
+                if len(task_list_tasks) > 0:
+                    task_list.show()
+                    task_list.add_tasks(task_list_tasks)
+                else:
+                    task_list.hide()
             archive_model = build_tree_view_model(
                     self._archive_view.columns(), archived_tasks)
             self._archive_view.setModel(archive_model)

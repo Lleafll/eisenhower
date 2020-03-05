@@ -36,6 +36,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     def __init__(
             self,
             displayed_columns: Sequence[Column],
+            color: QtGui.QColor,
             parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
         self._displayed_columns = displayed_columns
@@ -46,6 +47,11 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.customContextMenuRequested.connect(self._open_context_menu)
         self.setRootIsDecorated(False)
         self.setAlternatingRowColors(True)
+        palette = self.palette()
+        base_color = color.lighter(115)
+        palette.setColor(QtGui.QPalette.Base, base_color)
+        palette.setColor(QtGui.QPalette.AlternateBase, color)
+        self.setPalette(palette)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns

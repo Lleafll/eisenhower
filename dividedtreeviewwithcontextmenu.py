@@ -64,15 +64,25 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     set_important_requested = QtCore.Signal(Task)
     set_unimportant_requested = QtCore.Signal(Task)
 
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
+    def __init__(
+            self,
+            header_text: str,
+            color: QtGui.QColor,
+            parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
+        header_label = QtWidgets.QLabel(header_text, self)
+        header_label.setAlignment(QtCore.Qt.AlignCenter)
+        header_label_font = header_label.font()
+        header_label_font.setPointSize(14)
+        header_label.setFont(header_label_font)
         self._upper_list = TreeViewWithContextMenu(
-                (Column.Name, Column.Due, Column.Snoozed), self)
+                (Column.Name, Column.Due, Column.Snoozed), color, self)
         self._lower_list = TreeViewWithContextMenu(
-                (Column.Name, Column.Due, Column.Snoozed), self)
+                (Column.Name, Column.Due, Column.Snoozed), color, self)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setMargin(0)
         layout.setSpacing(1)
+        layout.addWidget(header_label)
         for task_list in (self._upper_list, self._lower_list):
             layout.addWidget(task_list)
             task_list.setWordWrap(True)
