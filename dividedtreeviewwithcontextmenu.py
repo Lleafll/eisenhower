@@ -83,6 +83,8 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         self._lower_list = TreeViewWithContextMenu(
                 (Column.Name, Column.Due, Column.Snoozed), self)
         layout = QtWidgets.QVBoxLayout(self)
+        layout.setMargin(0)
+        layout.setSpacing(1)
         for task_list in (self._upper_list, self._lower_list):
             layout.addWidget(task_list)
             task_list.setWordWrap(True)

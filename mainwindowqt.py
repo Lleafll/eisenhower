@@ -34,6 +34,8 @@ class MainWindowQt(QtWidgets.QWidget):
         self.setAcceptDrops(True)
         self._task_manager: Optional[TaskManagerWrapper] = None
         layout = QtWidgets.QVBoxLayout(self)
+        layout.setMargin(0)
+        layout.setSpacing(0)
         self._undo_button = QtWidgets.QPushButton("Undo")
         self._redo_button = QtWidgets.QPushButton("Redo")
         self._show_archive_button = QtWidgets.QPushButton("Show Archive")
@@ -48,6 +50,8 @@ class MainWindowQt(QtWidgets.QWidget):
         self._delegate_list = SeparatedTreeViewWithContextMenu(self)
         self._drop_list = SeparatedTreeViewWithContextMenu(self)
         task_layout = QtWidgets.QHBoxLayout()
+        task_layout.setMargin(0)
+        task_layout.setSpacing(5)
         layout.addLayout(task_layout)
         for task_list in (
                 self._do_list,
