@@ -15,34 +15,34 @@ class TaskManager:
         return self._history.present()
 
     def add(self, task: Task) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         tasks.append(task)
 
     def delete(self, task: Task) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         _delete(tasks, task)
 
     def set_complete(self, task: Task, is_complete: bool = True) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         _complete(tasks, task, is_complete)
 
     def schedule(self, task: Task, due: Optional[DueDate]) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         new_task = replace(task, due=due)
         _replace(tasks, task, new_task)
 
     def snooze(self, task: Task, time: Optional[date]) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         new_task = replace(task, snooze=time)
         _replace(tasks, task, new_task)
 
     def rename(self, task: Task, new_name: str) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         new_task = replace(task, name=new_name)
         _replace(tasks, task, new_task)
 
     def set_importance(self, task: Task, importance: Importance) -> None:
-        tasks = self._history.write_history()
+        tasks = self._history.advance_history()
         new_task = replace(task, importance=importance)
         _replace(tasks, task, new_task)
 

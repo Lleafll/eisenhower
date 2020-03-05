@@ -36,7 +36,7 @@ class History:
         self._current += 1
         return self.present()
 
-    def write_history(self) -> Tasks:
+    def advance_history(self) -> Tasks:
         # No deep copy necessary, all elements are immutable
         new_present = copy(self.present())
         self._current += 1
