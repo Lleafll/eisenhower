@@ -41,7 +41,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self._displayed_columns = displayed_columns
         self._show_add_task_in_context_menu = True
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
-        self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
         self.setRootIsDecorated(False)
