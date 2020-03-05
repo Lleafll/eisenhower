@@ -45,6 +45,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
         self.setRootIsDecorated(False)
+        self.setAlternatingRowColors(True)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
