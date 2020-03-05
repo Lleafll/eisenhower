@@ -93,6 +93,7 @@ class MainWindowQt(QtWidgets.QWidget):
         task_manager = load_task_manager(path)
         if isinstance(task_manager, TaskManager):
             self._task_manager = TaskManagerWrapper(task_manager, path)
+            self.setWindowTitle(path.name)
             self._update()
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
