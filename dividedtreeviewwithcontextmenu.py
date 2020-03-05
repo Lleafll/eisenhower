@@ -53,36 +53,14 @@ class CalendarDelegate(QtWidgets.QItemDelegate):
 class ItemWordWrap(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
-        self.parent = parent
-
-    def paint(
-            self,
-            painter: QtGui.QPainter,
-            option: QtWidgets.QStyleOption,
-            index: QtCore.QModelIndex) -> None:
-        text = index.model().data(index)
-        document = QtGui.QTextDocument()
-        document.setHtml(text)
-        document.setTextWidth(option.rect.width())
-        index.model().setData(index, option.rect.width(), QtCore.Qt.UserRole+1)
-        painter.save()
-        painter.translate(option.rect.x(), option.rect.y())
-        document.drawContents(painter)
-        painter.restore()
 
     def sizeHint(
             self,
             option: QtWidgets.QStyleOption,
             index: QtCore.QModelIndex) -> None:
-        text = index.model().data(index)
-        document = QtGui.QTextDocument()
-        document.setHtml(text)
-        width = index.model().data(index, QtCore.Qt.UserRole+1)
-        if not width:
-            width = 20
-        document.setTextWidth(width)
-        return QtCore.QSize(
-                document.idealWidth() + 10,  document.size().height())
+        size = super().sizeHint(option, index)
+        size.setHeight(35)
+        return size
 
 
 class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
@@ -107,6 +85,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         for task_list in (self._upper_list, self._lower_list):
             layout.addWidget(task_list)
+            task_list.setWordWrap(True)
             task_list.add_task_requested.connect(self.add_task_requested)
             task_list.complete_task_requested.connect(
                     self.complete_task_requested)
