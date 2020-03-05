@@ -50,6 +50,19 @@ class CalendarDelegate(QtWidgets.QItemDelegate):
         model.setData(index, date)
 
 
+class ItemWordWrap(QtWidgets.QStyledItemDelegate):
+    def __init__(self, parent: QtWidgets.QWidget) -> None:
+        super().__init__(parent)
+
+    def sizeHint(
+            self,
+            option: QtWidgets.QStyleOption,
+            index: QtCore.QModelIndex) -> None:
+        size = super().sizeHint(option, index)
+        size.setHeight(35)
+        return size
+
+
 class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     add_task_requested = QtCore.Signal(str)
     complete_task_requested = QtCore.Signal(Task)
@@ -72,6 +85,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         layout = QtWidgets.QVBoxLayout(self)
         for task_list in (self._upper_list, self._lower_list):
             layout.addWidget(task_list)
+            task_list.setWordWrap(True)
             task_list.add_task_requested.connect(self.add_task_requested)
             task_list.complete_task_requested.connect(
                     self.complete_task_requested)
@@ -125,5 +139,6 @@ def _build_model_and_connect(
         header.resizeSection(i, 80)
     header.setStretchLastSection(False)
     model.itemChanged.connect(lambda item: view._item_changed(task_list, item))
-    task_list.setItemDelegateForColumn(1, CalendarDelegate(task_list))
-    task_list.setItemDelegateForColumn(2, CalendarDelegate(task_list))
+    task_list.setItemDelegateForColumn(0, ItemWordWrap(task_list))
+    for i in (1, 2):
+        task_list.setItemDelegateForColumn(i, CalendarDelegate(task_list))
