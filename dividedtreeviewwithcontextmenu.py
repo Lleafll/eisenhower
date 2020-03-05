@@ -117,6 +117,13 @@ def _build_model_and_connect(
         view: SeparatedTreeViewWithContextMenu) -> None:
     model = build_tree_view_model(task_list.columns(), tasks)
     task_list.setModel(model)
+    header = task_list.header()
+    header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
+    for i in range(1, 3):
+        header.setSectionResizeMode(
+                i, QtWidgets.QHeaderView.ResizeMode.Fixed)
+        header.resizeSection(i, 80)
+    header.setStretchLastSection(False)
     model.itemChanged.connect(lambda item: view._item_changed(task_list, item))
     task_list.setItemDelegateForColumn(1, CalendarDelegate(task_list))
     task_list.setItemDelegateForColumn(2, CalendarDelegate(task_list))
