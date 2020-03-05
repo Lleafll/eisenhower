@@ -6,21 +6,9 @@ from typing import Sequence
 from datetime import date
 
 
-class CalendarDelegate(QtWidgets.QItemDelegate):
+class CalendarDelegate(QtWidgets.QStyledItemDelegate):
     def __init__(self, parent: QtCore.QObject):
         super().__init__(parent)
-
-    def paint(
-            self,
-            painter: QtGui.QPainter,
-            option: QtWidgets.QStyleOptionViewItem,
-            index: QtCore.QModelIndex) -> None:
-        text = index.model().data(index, QtCore.Qt.DisplayRole).toString(
-                QtCore.Qt.SystemLocaleDate)
-        option.displayAlignment = \
-            QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
-        self.drawDisplay(painter, option, option.rect, text)
-        self.drawFocus(painter, option, option.rect)
 
     def createEditor(
             self,
