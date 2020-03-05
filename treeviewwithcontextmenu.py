@@ -23,7 +23,7 @@ class Column(Enum):
 
 
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
-    add_task_requested = QtCore.Signal(str)
+    add_task_requested = QtCore.Signal()
     complete_task_requested = QtCore.Signal(Task)
     set_immediate_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
@@ -103,8 +103,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         else:
             if self._show_add_task_in_context_menu:
                 add_task_action = QtWidgets.QAction("Add Task")
-                add_task_action.triggered.connect(
-                    lambda: self.add_task_requested.emit("New Task"))
+                add_task_action.triggered.connect(self.add_task_requested)
                 context_menu.addAction(add_task_action)
         if len(context_menu.actions()) > 0:
             context_menu.exec_(self.viewport().mapToGlobal(point))

@@ -52,7 +52,7 @@ class ItemWordWrap(QtWidgets.QStyledItemDelegate):
 
 
 class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
-    add_task_requested = QtCore.Signal(str)
+    add_task_requested = QtCore.Signal()
     complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
     rename_task_requested = QtCore.Signal(Task, str)

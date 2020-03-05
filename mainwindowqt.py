@@ -38,11 +38,13 @@ class MainWindowQt(QtWidgets.QWidget):
         layout.setSpacing(0)
         self._undo_button = QtWidgets.QPushButton("Undo")
         self._redo_button = QtWidgets.QPushButton("Redo")
+        self._add_task_button = QtWidgets.QPushButton("Add Task")
         self._show_archive_button = QtWidgets.QPushButton("Show Archive")
         button_layout = QtWidgets.QHBoxLayout()
         layout.addLayout(button_layout)
         button_layout.addWidget(self._undo_button)
         button_layout.addWidget(self._redo_button)
+        button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._show_archive_button)
         button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(self)
@@ -77,6 +79,7 @@ class MainWindowQt(QtWidgets.QWidget):
                         task, Importance.Unimportant))
         self._undo_button.clicked.connect(self._undo)
         self._redo_button.clicked.connect(self._redo)
+        self._add_task_button.clicked.connect(self._add_task)
         self._show_archive_button.clicked.connect(self._show_archive)
         self._archive_view = TreeViewWithContextMenu(
                 (Column.Name, Column.Archived), self)
@@ -144,7 +147,7 @@ class MainWindowQt(QtWidgets.QWidget):
         save_task_manager(self._task_manager.path, self._task_manager.instance)
         self._update()
 
-    def _add_task(self, task_name: str) -> None:
+    def _add_task(self) -> None:
         if self._task_manager is None:
             return
         task = TaskCreatorDialogQt.askNewTask(self)
