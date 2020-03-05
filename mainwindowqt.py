@@ -32,6 +32,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
+        self.setPalette(QtGui.QPalette(QtCore.Qt.white))
         self._task_manager: Optional[TaskManagerWrapper] = None
         layout = QtWidgets.QVBoxLayout(self)
         layout.setMargin(0)
