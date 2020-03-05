@@ -44,6 +44,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.SingleSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
+        self.setRootIsDecorated(False)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
