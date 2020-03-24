@@ -52,6 +52,11 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         palette.setColor(QtGui.QPalette.Base, base_color)
         palette.setColor(QtGui.QPalette.AlternateBase, color)
         self.setPalette(palette)
+        self.setStyleSheet(
+            "QHeaderView::section {"
+            "background-color: rgb(114, 118, 138);"
+            "border: none;"
+            "}")
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns

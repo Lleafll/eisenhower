@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets, QtGui
 from task import (
         Task,
         is_completed,
@@ -32,7 +32,9 @@ class MainWindowQt(QtWidgets.QWidget):
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
-        self.setPalette(QtGui.QPalette(QtCore.Qt.white))
+        palette = self.palette()
+        palette.setColor(QtGui.QPalette.Window, QtGui.QColor(50, 54, 76))
+        self.setPalette(palette)
         self._task_manager: Optional[TaskManagerWrapper] = None
         layout = QtWidgets.QVBoxLayout(self)
         layout.setMargin(0)
@@ -49,13 +51,13 @@ class MainWindowQt(QtWidgets.QWidget):
         button_layout.addWidget(self._show_archive_button)
         button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(
-                "Do", QtGui.QColor(255, 210, 194), self)
+                "Do", QtGui.QColor(240, 98, 146), self)
         self._decide_list = SeparatedTreeViewWithContextMenu(
-                "Decide", QtGui.QColor(255, 221, 170), self)
+                "Decide", QtGui.QColor(255, 149, 157), self)
         self._delegate_list = SeparatedTreeViewWithContextMenu(
-                "Delegate", QtGui.QColor(255, 255, 170), self)
+                "Delegate", QtGui.QColor(255, 215, 140), self)
         self._drop_list = SeparatedTreeViewWithContextMenu(
-                "Drop", QtGui.QColor(181, 255, 170), self)
+                "Drop", QtGui.QColor(128, 222, 234), self)
         task_layout = QtWidgets.QHBoxLayout()
         task_layout.setMargin(0)
         task_layout.setSpacing(5)
