@@ -45,6 +45,10 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
         self.setRootIsDecorated(False)
+        self.setEditTriggers(
+                QtWidgets.QAbstractItemView.EditKeyPressed |
+                QtWidgets.QAbstractItemView.AnyKeyPressed |
+                QtWidgets.QAbstractItemView.SelectedClicked)
         self.setAlternatingRowColors(True)
         palette = self.palette()
         base_color = color.lighter(115)
