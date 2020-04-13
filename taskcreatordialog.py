@@ -19,17 +19,17 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         importance_buttons_layout.addWidget(unimportant_button)
         self._important_button.setChecked(True)
         due_buttons_box = QtWidgets.QGroupBox(self)
-        self._no_due_button = QtWidgets.QRadioButton(
-                "No due date", due_buttons_box)
         self._immediate_due_button = QtWidgets.QRadioButton(
                 "Immediate", due_buttons_box)
         self._due_date_button = QtWidgets.QRadioButton(
                 "Due date", due_buttons_box)
+        self._no_due_button = QtWidgets.QRadioButton(
+                "No due date", due_buttons_box)
         due_buttons_layout = QtWidgets.QHBoxLayout(due_buttons_box)
-        due_buttons_layout.addWidget(self._no_due_button)
         due_buttons_layout.addWidget(self._immediate_due_button)
         due_buttons_layout.addWidget(self._due_date_button)
-        self._no_due_button.setChecked(True)
+        due_buttons_layout.addWidget(self._no_due_button)
+        self._immediate_due_button.setChecked(True)
         self._due_date_widget = QtWidgets.QCalendarWidget(self)
         self._due_date_widget.hide()
         buttons = QtWidgets.QDialogButtonBox(
