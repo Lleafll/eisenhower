@@ -29,7 +29,7 @@ class TaskManagerWrapper:
 def _style_button(button: QtWidgets.QPushButton) -> None:
     button.setStyleSheet(
             "QPushButton:pressed {background-color: rgb(164, 168, 188)}" \
-                    "QPushButton {background-color: rgb(114, 118, 138); border: 1px solid black; padding: 5px}" \
+                    "QPushButton {background-color: rgb(114, 118, 138); border: 1px solid black; padding: 4px}" \
             "QPushButton:disabled { background-color: rgb(50, 54, 76) }")
 
 
