@@ -75,6 +75,10 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         header_label_font = header_label.font()
         header_label_font.setPointSize(14)
         header_label.setFont(header_label_font)
+        header_label_palette = header_label.palette()
+        header_label_palette.setColor(
+                header_label.foregroundRole(), QtGui.QColor(114, 118, 138))
+        header_label.setPalette(header_label_palette)
         self._upper_list = TreeViewWithContextMenu(
                 (Column.Name, Column.Due, Column.Snoozed), color, self)
         self._lower_list = TreeViewWithContextMenu(
