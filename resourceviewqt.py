@@ -24,6 +24,8 @@ class ResourceViewQt(QtWidgets.QListView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setTextElideMode(QtCore.Qt.ElideMiddle)
 
     def resources(self) -> List[Path]:
         resources: List[Path] = []
