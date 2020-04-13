@@ -3,7 +3,7 @@ from task import Task, Importance, Immediate, DueDate
 from typing import Optional
 
 
-_default_task = Task("New Task", Importance.Important)
+_default_task = Task("", Importance.Important, Immediate)
 
 
 class TaskCreatorDialogQt(QtWidgets.QDialog):
