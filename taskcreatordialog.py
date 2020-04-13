@@ -75,7 +75,8 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
             due = Immediate
         else:
             due = self._due_date_widget.selectedDate()
-        return Task(name, importance, due)
+        resources = self._resource_list.resources()
+        return Task(name, importance, due, resources=resources)
 
     @staticmethod
     def askNewTask(

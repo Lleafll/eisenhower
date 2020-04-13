@@ -1,5 +1,7 @@
 from PySide2 import QtWidgets, QtGui, QtCore
 from task import Task
+from pathlib import Path
+from typing import List
 
 
 class ResourceViewQt(QtWidgets.QListView):
@@ -7,11 +9,22 @@ class ResourceViewQt(QtWidgets.QListView):
         super().__init__(parent)
         self._model = QtGui.QStandardItemModel()
         for resource in task.resources:
-            path = QtCore.QUrl(resource.as_uri())
-            item = QtGui.QStandardItem(path)
+            path = QtCore.QUrl(resource.as_posix())
+            item = QtGui.QStandardItem()
+            item.setData(path, QtCore.Qt.DisplayRole)
             self._model.appendRow(item)
         self.setModel(self._model)
         self.setAcceptDrops(True)
+
+    def resources(self) -> List[Path]:
+        resources: List[Path] = []
+        for row_index in range(self._model.rowCount(QtCore.QModelIndex())):
+            index = self._model.index(row_index, 0, QtCore.QModelIndex())
+            data = index.data(QtCore.Qt.DisplayRole)
+            print(data)
+            path = Path(data.toString())
+            resources.append(path)
+        return resources
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         if event.mimeData().hasUrls():
