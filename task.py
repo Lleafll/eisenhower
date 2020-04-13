@@ -1,4 +1,5 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from pathlib import Path
 from datetime import date
 from typing import Optional, Iterable, Tuple, List, Union
 from enum import Enum, auto
@@ -25,6 +26,7 @@ class Task:
     due: Optional[DueDate] = None
     snooze: Optional[date] = None
     completed: Optional[date] = None
+    resources: List[Path] = field(default_factory=list)
 
 
 def has_due_date(task: Task) -> bool:

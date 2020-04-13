@@ -22,6 +22,11 @@ class TaskManager:
         tasks = self._history.advance_history()
         _delete(tasks, task)
 
+    def replace(self, old_task: Task, new_task: Task) -> None:
+        tasks = self._history.advance_history()
+        _delete(tasks, old_task)
+        tasks.append(new_task)
+
     def set_complete(self, task: Task, is_complete: bool = True) -> None:
         tasks = self._history.advance_history()
         _complete(tasks, task, is_complete)
