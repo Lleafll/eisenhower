@@ -3,10 +3,16 @@ from task import Task, Importance, Immediate, DueDate
 from typing import Optional
 
 
+_default_task = Task("New Task", Importance.Important)
+
+
 class TaskCreatorDialogQt(QtWidgets.QDialog):
-    def __init__(self, parent: Optional[QtWidgets.QWidget]) -> None:
+    def __init__(
+            self,
+            task: Task=_default_task,
+            parent: Optional[QtWidgets.QWidget]=None) -> None:
         super().__init__(parent)
-        self.setWindowTitle("New Task")
+        self.setWindowTitle("Task")
         self._name_widget = QtWidgets.QLineEdit(self)
         importance_buttons_box = QtWidgets.QGroupBox(self)
         self._important_button = QtWidgets.QRadioButton(
@@ -17,7 +23,6 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
                 importance_buttons_box)
         importance_buttons_layout.addWidget(self._important_button)
         importance_buttons_layout.addWidget(unimportant_button)
-        self._important_button.setChecked(True)
         due_buttons_box = QtWidgets.QGroupBox(self)
         self._immediate_due_button = QtWidgets.QRadioButton(
                 "Immediate", due_buttons_box)
@@ -29,7 +34,6 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         due_buttons_layout.addWidget(self._immediate_due_button)
         due_buttons_layout.addWidget(self._due_date_button)
         due_buttons_layout.addWidget(self._no_due_button)
-        self._immediate_due_button.setChecked(True)
         self._due_date_widget = QtWidgets.QCalendarWidget(self)
         self._due_date_widget.hide()
         buttons = QtWidgets.QDialogButtonBox(
@@ -45,6 +49,18 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         self._due_date_button.toggled.connect(self._due_date_widget.setVisible)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
+        self._name_widget.setText(task.name)
+        if task.importance == Importance.Important:
+            self._important_button.setChecked(True)
+        else:
+            self._unimportant_button.setChecked(True)
+        if task.due == Immediate:
+            self._immediate_due_button.setChecked(True)
+        elif task.due is None:
+            self._no_due_button.setChecked(True)
+        else:
+            self._due_date_button.setChecked(True)
+            self._due_date_widget.setSelectedDate(task.due)
 
     def task(self) -> Task:
         name: str = self._name_widget.text()
@@ -59,8 +75,10 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         return Task(name, importance, due)
 
     @staticmethod
-    def askNewTask(parent: Optional[QtWidgets.QWidget]) -> Optional[Task]:
-        dialog = TaskCreatorDialogQt(parent)
+    def askNewTask(
+            parent: Optional[QtWidgets.QWidget]=None,
+            task: Task=_default_task) -> Optional[Task]:
+        dialog = TaskCreatorDialogQt(task, parent)
         success = dialog.exec_()
         if success == QtWidgets.QDialog.Accepted:
             return dialog.task()
