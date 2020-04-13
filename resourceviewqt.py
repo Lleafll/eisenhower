@@ -25,8 +25,7 @@ class ResourceViewQt(QtWidgets.QListView):
         for row_index in range(self._model.rowCount(QtCore.QModelIndex())):
             index = self._model.index(row_index, 0, QtCore.QModelIndex())
             data = index.data(QtCore.Qt.DisplayRole)
-            print(data)
-            path = Path(data.toString())
+            path = Path(data)
             resources.append(path)
         return resources
 
@@ -42,5 +41,5 @@ class ResourceViewQt(QtWidgets.QListView):
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
                 item = QtGui.QStandardItem()
-                item.setData(url, QtCore.Qt.DisplayRole)
+                item.setData(url.toDisplayString(), QtCore.Qt.DisplayRole)
                 self._model.appendRow(item)
