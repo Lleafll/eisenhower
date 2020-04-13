@@ -9,27 +9,27 @@ _default_task = Task("New Task", Importance.Important)
 class TaskCreatorDialogQt(QtWidgets.QDialog):
     def __init__(
             self,
-            task: Task=_default_task,
-            parent: Optional[QtWidgets.QWidget]=None) -> None:
+            task: Task = _default_task,
+            parent: Optional[QtWidgets.QWidget] = None) -> None:
         super().__init__(parent)
         self.setWindowTitle("Task")
         self._name_widget = QtWidgets.QLineEdit(self)
         importance_buttons_box = QtWidgets.QGroupBox(self)
         self._important_button = QtWidgets.QRadioButton(
-                "Important", importance_buttons_box)
+            "Important", importance_buttons_box)
         unimportant_button = QtWidgets.QRadioButton(
-                "Unimportant", importance_buttons_box)
+            "Unimportant", importance_buttons_box)
         importance_buttons_layout = QtWidgets.QHBoxLayout(
-                importance_buttons_box)
+            importance_buttons_box)
         importance_buttons_layout.addWidget(self._important_button)
         importance_buttons_layout.addWidget(unimportant_button)
         due_buttons_box = QtWidgets.QGroupBox(self)
         self._immediate_due_button = QtWidgets.QRadioButton(
-                "Immediate", due_buttons_box)
+            "Immediate", due_buttons_box)
         self._due_date_button = QtWidgets.QRadioButton(
-                "Due date", due_buttons_box)
+            "Due date", due_buttons_box)
         self._no_due_button = QtWidgets.QRadioButton(
-                "No due date", due_buttons_box)
+            "No due date", due_buttons_box)
         due_buttons_layout = QtWidgets.QHBoxLayout(due_buttons_box)
         due_buttons_layout.addWidget(self._immediate_due_button)
         due_buttons_layout.addWidget(self._due_date_button)
@@ -76,8 +76,8 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
 
     @staticmethod
     def askNewTask(
-            parent: Optional[QtWidgets.QWidget]=None,
-            task: Task=_default_task) -> Optional[Task]:
+            parent: Optional[QtWidgets.QWidget] = None,
+            task: Task = _default_task) -> Optional[Task]:
         dialog = TaskCreatorDialogQt(task, parent)
         success = dialog.exec_()
         if success == QtWidgets.QDialog.Accepted:
