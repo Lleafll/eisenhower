@@ -63,6 +63,9 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         index = self.indexAt(point)
         context_menu = QtWidgets.QMenu()
         if index.isValid():
+            rename_action = QtWidgets.QAction("Change")
+            rename_action.triggered.connect(lambda: self.edit(index))
+            context_menu.addAction(rename_action)
             task: Task = index.data(TASK_ROLE)
             if task.importance == Importance.Important:
                 set_unimportant_task = QtWidgets.QAction("Make Unimportant")
