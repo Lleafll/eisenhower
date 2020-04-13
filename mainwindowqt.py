@@ -26,6 +26,13 @@ class TaskManagerWrapper:
     path: Path
 
 
+def _style_button(button: QtWidgets.QPushButton) -> None:
+    button.setStyleSheet(
+            "QPushButton:pressed {background-color: rgb(164, 168, 188)}" \
+                    "QPushButton {background-color: rgb(114, 118, 138); border: 1px solid black; padding: 5px}" \
+            "QPushButton:disabled { background-color: rgb(50, 54, 76) }")
+
+
 class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
@@ -43,11 +50,15 @@ class MainWindowQt(QtWidgets.QWidget):
         self._redo_button = QtWidgets.QPushButton("Redo")
         self._add_task_button = QtWidgets.QPushButton("Add Task")
         self._show_archive_button = QtWidgets.QPushButton("Show Archive")
+        _style_button(self._undo_button)
+        _style_button(self._redo_button)
+        _style_button(self._add_task_button)
+        _style_button(self._show_archive_button)
         button_layout = QtWidgets.QVBoxLayout()
         layout.addLayout(button_layout)
+        button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._undo_button)
         button_layout.addWidget(self._redo_button)
-        button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._show_archive_button)
         button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(
