@@ -2,6 +2,7 @@ from PySide2 import QtWidgets, QtGui, QtCore
 from task import Task
 from pathlib import Path
 from typing import List
+from os import startfile
 
 
 class ResourceViewQt(QtWidgets.QListView):
@@ -9,12 +10,15 @@ class ResourceViewQt(QtWidgets.QListView):
         super().__init__(parent)
         self._model = QtGui.QStandardItemModel()
         for resource in task.resources:
-            path = QtCore.QUrl(resource.as_posix())
+            path = resource.as_posix()
             item = QtGui.QStandardItem()
             item.setData(path, QtCore.Qt.DisplayRole)
             self._model.appendRow(item)
         self.setModel(self._model)
         self.setAcceptDrops(True)
+        self.setEditTriggers(self.NoEditTriggers)
+        self.doubleClicked.connect(lambda index: startfile(
+            index.data(QtCore.Qt.DisplayRole)))
 
     def resources(self) -> List[Path]:
         resources: List[Path] = []
