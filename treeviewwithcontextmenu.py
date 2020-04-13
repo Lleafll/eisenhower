@@ -40,7 +40,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             parent: QtWidgets.QWidget) -> None:
         super().__init__(parent)
         self._displayed_columns = displayed_columns
-        self._show_add_task_in_context_menu = True
         self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
         self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
@@ -55,9 +54,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
-
-    def show_add_task_in_context_menu(self, value: bool) -> None:
-        self._show_add_task_in_context_menu = value
 
     def _open_context_menu(self, point: QtCore.QPoint) -> None:
         index = self.indexAt(point)
@@ -106,11 +102,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             delete_action.triggered.connect(
                 lambda: self.delete_task_requested.emit(task))
             context_menu.addAction(delete_action)
-        else:
-            if self._show_add_task_in_context_menu:
-                add_task_action = QtWidgets.QAction("Add Task")
-                add_task_action.triggered.connect(self.add_task_requested)
-                context_menu.addAction(add_task_action)
         if len(context_menu.actions()) > 0:
             context_menu.exec_(self.viewport().mapToGlobal(point))
 

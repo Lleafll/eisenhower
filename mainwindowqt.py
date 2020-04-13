@@ -92,7 +92,6 @@ class MainWindowQt(QtWidgets.QWidget):
                 self)
         self._archive_view.setWindowFlag(QtGui.Qt.Window)
         self._archive_view.setWindowTitle("Task Archive")
-        self._archive_view.show_add_task_in_context_menu(False)
         self._archive_view.hide()
         self._archive_view.delete_task_requested.connect(self._delete_task)
         self._archive_view.unarchive_task_requested.connect(
