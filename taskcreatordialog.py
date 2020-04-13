@@ -1,6 +1,7 @@
 from PySide2 import QtWidgets
 from task import Task, Importance, Immediate, DueDate
 from typing import Optional
+from resourceviewqt import ResourceViewQt
 
 
 _default_task = Task("", Importance.Important, Immediate)
@@ -36,6 +37,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         due_buttons_layout.addWidget(self._no_due_button)
         self._due_date_widget = QtWidgets.QCalendarWidget(self)
         self._due_date_widget.hide()
+        self._resource_list = ResourceViewQt(task, self)
         buttons = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
             self)
@@ -45,6 +47,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         layout.addRow("Importance", importance_buttons_box)
         layout.addRow("Due", due_buttons_box)
         layout.addRow("", self._due_date_widget)
+        layout.addRow("Resources", self._resource_list)
         layout.addRow(buttons)
         self._due_date_button.toggled.connect(self._due_date_widget.setVisible)
         buttons.accepted.connect(self.accept)
