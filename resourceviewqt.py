@@ -19,6 +19,11 @@ class ResourceViewQt(QtWidgets.QListView):
         self.setEditTriggers(self.NoEditTriggers)
         self.doubleClicked.connect(lambda index: startfile(
             index.data(QtCore.Qt.DisplayRole)))
+        self.setAlternatingRowColors(True)
+        self.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectRows)
+        self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
+        self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._open_context_menu)
 
     def resources(self) -> List[Path]:
         resources: List[Path] = []
@@ -43,3 +48,21 @@ class ResourceViewQt(QtWidgets.QListView):
                 item = QtGui.QStandardItem()
                 item.setData(url.toDisplayString(), QtCore.Qt.DisplayRole)
                 self._model.appendRow(item)
+
+    def _open_context_menu(self, point: QtCore.QPoint) -> None:
+        index = self.indexAt(point)
+        context_menu = QtWidgets.QMenu()
+        if index.isValid():
+            open_action = QtWidgets.QAction("Open")
+            open_action.triggered.connect(lambda: startfile(
+                index.data(QtCore.Qt.DisplayRole)))
+            context_menu.addAction(open_action)
+            rename_action = QtWidgets.QAction("Rename")
+            rename_action.triggered.connect(lambda: self.edit(index))
+            context_menu.addAction(rename_action)
+            delete_action = QtWidgets.QAction("Delete")
+            delete_action.triggered.connect(lambda: self._model.removeRow(
+                index.row()))
+            context_menu.addAction(delete_action)
+        if len(context_menu.actions()) > 0:
+            context_menu.exec_(self.viewport().mapToGlobal(point))
