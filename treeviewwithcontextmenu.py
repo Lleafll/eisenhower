@@ -32,6 +32,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     remove_snooze_requested = QtCore.Signal(Task)
     set_important_requested = QtCore.Signal(Task)
     set_unimportant_requested = QtCore.Signal(Task)
+    task_view_requested = QtCore.Signal(Task)
 
     def __init__(
             self,
@@ -55,6 +56,8 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         palette.setColor(QtGui.QPalette.Base, base_color)
         palette.setColor(QtGui.QPalette.AlternateBase, color)
         self.setPalette(palette)
+        self.doubleClicked.connect(lambda index: self.task_view_requested.emit(
+            self.model().data(index, TASK_ROLE)))
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
