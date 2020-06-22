@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide2 import QtWidgets, QtGui
 from task import (
         Task,
         is_completed,
@@ -26,13 +26,22 @@ class TaskManagerWrapper:
     path: Path
 
 
+def _style_button(button: QtWidgets.QPushButton) -> None:
+    button.setStyleSheet(
+            "QPushButton:pressed {background-color: rgb(164, 168, 188)}" \
+                    "QPushButton {background-color: rgb(114, 118, 138); border: 1px solid black; padding: 4px}" \
+            "QPushButton:disabled { background-color: rgb(50, 54, 76) }")
+
+
 class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
-        self.setPalette(QtGui.QPalette(QtCore.Qt.white))
+        palette = self.palette()
+        palette.setColor(QtGui.QPalette.Window, QtGui.QColor(50, 54, 76))
+        self.setPalette(palette)
         self._task_manager: Optional[TaskManagerWrapper] = None
         layout = QtWidgets.QHBoxLayout(self)
         layout.setMargin(0)
@@ -41,21 +50,25 @@ class MainWindowQt(QtWidgets.QWidget):
         self._redo_button = QtWidgets.QPushButton("Redo")
         self._add_task_button = QtWidgets.QPushButton("Add Task")
         self._show_archive_button = QtWidgets.QPushButton("Show Archive")
+        _style_button(self._undo_button)
+        _style_button(self._redo_button)
+        _style_button(self._add_task_button)
+        _style_button(self._show_archive_button)
         button_layout = QtWidgets.QVBoxLayout()
         layout.addLayout(button_layout)
+        button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._undo_button)
         button_layout.addWidget(self._redo_button)
-        button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._show_archive_button)
         button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(
-                "Do", QtGui.QColor(255, 210, 194), self)
+                "Do", QtGui.QColor(240, 98, 146), self)
         self._decide_list = SeparatedTreeViewWithContextMenu(
-                "Decide", QtGui.QColor(255, 221, 170), self)
+                "Decide", QtGui.QColor(255, 149, 157), self)
         self._delegate_list = SeparatedTreeViewWithContextMenu(
-                "Delegate", QtGui.QColor(255, 255, 170), self)
+                "Delegate", QtGui.QColor(255, 215, 140), self)
         self._drop_list = SeparatedTreeViewWithContextMenu(
-                "Drop", QtGui.QColor(181, 255, 170), self)
+                "Drop", QtGui.QColor(128, 222, 234), self)
         task_layout = QtWidgets.QHBoxLayout()
         task_layout.setMargin(0)
         task_layout.setSpacing(5)
