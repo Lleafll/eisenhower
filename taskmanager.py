@@ -95,16 +95,6 @@ def load_task_manager(import_path: Path) -> TaskManager:
             tasks: Tasks = load(file)
     except FileNotFoundError:
         tasks = []
-    for i in range(len(tasks)):
-        task = tasks[i]
-        if not hasattr(task, "resources"):
-            new_task = Task(
-                task.name,
-                task.importance,
-                task.due,
-                task.snooze,
-                task.completed)
-            tasks[i] = new_task
     return TaskManager(tasks)
 
 
