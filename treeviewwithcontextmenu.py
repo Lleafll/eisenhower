@@ -65,6 +65,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             "}")
         self.header().setSortIndicatorShown(True)
         self.header().setSectionsClickable(True)
+        self.setSortingEnabled(True)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
