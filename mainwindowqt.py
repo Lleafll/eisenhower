@@ -1,23 +1,23 @@
 from PySide2 import QtWidgets, QtGui
 from task import (
-        Task,
-        is_completed,
-        has_due_date,
-        is_important,
-        DueDate,
-        Immediate,
-        Importance)
+    Task,
+    is_completed,
+    has_due_date,
+    is_important,
+    DueDate,
+    Immediate,
+    Importance)
 from taskmanager import (
-        TaskManager, load_task_manager, save_task_manager)
+    TaskManager, load_task_manager, save_task_manager)
 from typing import Optional
 from pathlib import Path
 from dataclasses import dataclass
 from datetime import date
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 from treeviewwithcontextmenu import (
-        TreeViewWithContextMenu, build_tree_view_model, Column)
+    TreeViewWithContextMenu, build_tree_view_model, Column)
 from itertools import filterfalse
-from taskcreatordialog import TaskCreatorDialogQt
+from taskcreatordialogqt import TaskCreatorDialogQt
 
 
 @dataclass(frozen=True)
@@ -28,9 +28,10 @@ class TaskManagerWrapper:
 
 def _style_button(button: QtWidgets.QPushButton) -> None:
     button.setStyleSheet(
-            "QPushButton:pressed {background-color: rgb(164, 168, 188)}" \
-                    "QPushButton {background-color: rgb(114, 118, 138); border: 1px solid black; padding: 4px}" \
-            "QPushButton:disabled { background-color: rgb(50, 54, 76) }")
+        "QPushButton:pressed {background-color: rgb(164, 168, 188)}"
+        "QPushButton {background-color: rgb(114, 118, 138);"
+        "border: 1px solid black; padding: 4px}"
+        "QPushButton:disabled { background-color: rgb(50, 54, 76) }")
 
 
 class MainWindowQt(QtWidgets.QWidget):
@@ -62,13 +63,13 @@ class MainWindowQt(QtWidgets.QWidget):
         button_layout.addWidget(self._show_archive_button)
         button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(
-                "Do", QtGui.QColor(240, 98, 146), self)
+            "Do", QtGui.QColor(240, 98, 146), self)
         self._decide_list = SeparatedTreeViewWithContextMenu(
-                "Decide", QtGui.QColor(255, 149, 157), self)
+            "Decide", QtGui.QColor(255, 149, 157), self)
         self._delegate_list = SeparatedTreeViewWithContextMenu(
-                "Delegate", QtGui.QColor(255, 215, 140), self)
+            "Delegate", QtGui.QColor(255, 215, 140), self)
         self._drop_list = SeparatedTreeViewWithContextMenu(
-                "Drop", QtGui.QColor(128, 222, 234), self)
+            "Drop", QtGui.QColor(128, 222, 234), self)
         task_layout = QtWidgets.QHBoxLayout()
         task_layout.setMargin(0)
         task_layout.setSpacing(5)
@@ -88,28 +89,28 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.remove_snooze_requested.connect(self._set_snooze)
             task_list.add_task_requested.connect(self._add_task)
             task_list.set_immediate_requested.connect(
-                    lambda task: self._set_due(task, Immediate))
+                lambda task: self._set_due(task, Immediate))
             task_list.set_important_requested.connect(
-                    lambda task: self._set_importance(
-                        task, Importance.Important))
+                lambda task: self._set_importance(
+                    task, Importance.Important))
             task_list.set_unimportant_requested.connect(
-                    lambda task: self._set_importance(
-                        task, Importance.Unimportant))
+                lambda task: self._set_importance(
+                    task, Importance.Unimportant))
             task_list.task_view_requested.connect(self._open_task)
         self._undo_button.clicked.connect(self._undo)
         self._redo_button.clicked.connect(self._redo)
         self._add_task_button.clicked.connect(self._add_task)
         self._show_archive_button.clicked.connect(self._show_archive)
         self._archive_view = TreeViewWithContextMenu(
-                (Column.Name, Column.Archived),
-                QtGui.QColor(255, 255, 255),
-                self)
+            (Column.Name, Column.Archived),
+            QtGui.QColor(255, 255, 255),
+            self)
         self._archive_view.setWindowFlag(QtGui.Qt.Window)
         self._archive_view.setWindowTitle("Task Archive")
         self._archive_view.hide()
         self._archive_view.delete_task_requested.connect(self._delete_task)
         self._archive_view.unarchive_task_requested.connect(
-                self._unarchive_task)
+            self._unarchive_task)
         self._update()
 
     def load_from_file(self, path: Path) -> None:
@@ -152,15 +153,15 @@ class MainWindowQt(QtWidgets.QWidget):
                 if len(task_list_tasks) > 0:
                     task_list.add_tasks(task_list_tasks)
             archive_model = build_tree_view_model(
-                    self._archive_view.columns(), archived_tasks)
+                self._archive_view.columns(), archived_tasks)
             self._archive_view.setModel(archive_model)
             self._undo_button.show()
             self._redo_button.show()
             self._show_archive_button.show()
             self._undo_button.setEnabled(
-                    self._task_manager.instance.is_undoable())
+                self._task_manager.instance.is_undoable())
             self._redo_button.setEnabled(
-                    self._task_manager.instance.is_redoable())
+                self._task_manager.instance.is_redoable())
 
     def _update_and_save(self) -> None:
         if self._task_manager is None:
