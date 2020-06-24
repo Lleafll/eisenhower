@@ -1,4 +1,4 @@
-from PySide2 import QtWidgets, QtGui
+from PySide2 import QtWidgets, QtGui, QtCore
 from task import (
     Task,
     is_completed,
@@ -107,6 +107,7 @@ class MainWindowQt(QtWidgets.QWidget):
             self)
         self._archive_view.setWindowFlag(QtGui.Qt.Window)
         self._archive_view.setWindowTitle("Task Archive")
+        self._archive_view.sortByColumn(1, QtCore.Qt.SortOrder.DescendingOrder)
         self._archive_view.hide()
         self._archive_view.delete_task_requested.connect(self._delete_task)
         self._archive_view.unarchive_task_requested.connect(

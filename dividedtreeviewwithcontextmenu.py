@@ -105,6 +105,8 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list.set_unimportant_requested.connect(
                     self.set_unimportant_requested)
             task_list.task_view_requested.connect(self.task_view_requested)
+        self._upper_list.sortByColumn(1, QtCore.Qt.SortOrder.AscendingOrder)
+        self._lower_list.sortByColumn(2, QtCore.Qt.SortOrder.AscendingOrder)
 
     def add_tasks(self, tasks: Sequence[Task]) -> None:
         due_tasks, normal_tasks, snoozed_tasks, completed_tasks = \
