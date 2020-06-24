@@ -1,5 +1,6 @@
 from PySide2 import QtWidgets
-from task import Task, Importance, Immediate, DueDate
+from datetime import date
+from task import Task, Importance, Immediate, DueDate, has_snoozed_date
 from typing import Optional
 from resourceviewqt import ResourceViewQt
 
@@ -37,6 +38,16 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         due_buttons_layout.addWidget(self._no_due_button)
         self._due_date_widget = QtWidgets.QCalendarWidget(self)
         self._due_date_widget.hide()
+        snooze_buttons_box = QtWidgets.QGroupBox(self)
+        self._is_snoozed_button = QtWidgets.QRadioButton(
+            "Set snooze", snooze_buttons_box)
+        self._no_snooze_button = QtWidgets.QRadioButton(
+            "No snooze", snooze_buttons_box)
+        snooze_buttons_layout = QtWidgets.QHBoxLayout(snooze_buttons_box)
+        snooze_buttons_layout.addWidget(self._is_snoozed_button)
+        snooze_buttons_layout.addWidget(self._no_snooze_button)
+        self._snoozed_date_widget = QtWidgets.QCalendarWidget(self)
+        self._snoozed_date_widget.hide()
         self._resource_list = ResourceViewQt(task, self)
         buttons = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
@@ -47,9 +58,13 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         layout.addRow("Importance", importance_buttons_box)
         layout.addRow("Due", due_buttons_box)
         layout.addRow("", self._due_date_widget)
+        layout.addRow("Snooze", snooze_buttons_box)
+        layout.addRow("", self._snoozed_date_widget)
         layout.addRow("Resources", self._resource_list)
         layout.addRow(buttons)
         self._due_date_button.toggled.connect(self._due_date_widget.setVisible)
+        self._is_snoozed_button.toggled.connect(
+            self._snoozed_date_widget.setVisible)
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
         self._name_widget.setText(task.name)
@@ -64,6 +79,11 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         else:
             self._due_date_button.setChecked(True)
             self._due_date_widget.setSelectedDate(task.due)
+        if has_snoozed_date(task):
+            self._is_snoozed_button.setChecked(True)
+            self._snoozed_date_widget.setSelectedDate(task.snooze)
+        else:
+            self._no_snooze_button.setChecked(True)
 
     def task(self) -> Task:
         name: str = self._name_widget.text()
@@ -75,8 +95,12 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
             due = Immediate
         else:
             due = self._due_date_widget.selectedDate()
+        if self._no_snooze_button.isChecked():
+            snooze: Optional[date] = None
+        else:
+            snooze = self._snoozed_date_widget.selectedDate()
         resources = self._resource_list.resources()
-        return Task(name, importance, due, resources=resources)
+        return Task(name, importance, due, snooze, resources=resources)
 
     @staticmethod
     def askNewTask(
