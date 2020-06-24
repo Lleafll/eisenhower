@@ -63,6 +63,8 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             "background-color: rgb(114, 118, 138);"
             "border: none;"
             "}")
+        self.header().setSortIndicatorShown(True)
+        self.header().setSectionsClickable(True)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
