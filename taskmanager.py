@@ -1,14 +1,14 @@
-from task import Task, Importance, DueDate
 from typing import Optional
 from datetime import date
 from dataclasses import replace
 from pickle import load, dump
 from pathlib import Path
+from task import Task, Importance
 from history import History, Tasks
 
 
 class TaskManager:
-    def __init__(self, tasks: Tasks = []) -> None:
+    def __init__(self, tasks: Tasks) -> None:
         self._history = History(tasks)
 
     def tasks(self) -> Tasks:
@@ -31,7 +31,7 @@ class TaskManager:
         tasks = self._history.advance_history()
         _complete(tasks, task, is_complete)
 
-    def schedule(self, task: Task, due: Optional[DueDate]) -> None:
+    def schedule(self, task: Task, due: Optional[date]) -> None:
         tasks = self._history.advance_history()
         new_task = replace(task, due=due)
         _replace(tasks, task, new_task)

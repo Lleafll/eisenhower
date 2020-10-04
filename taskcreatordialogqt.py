@@ -1,11 +1,11 @@
-from PySide2 import QtWidgets
-from datetime import date
-from task import Task, Importance, Immediate, DueDate, has_snoozed_date
 from typing import Optional
+from datetime import date
+from PySide2 import QtWidgets
+from task import Task, Importance, has_snoozed_date
 from resourceviewqt import ResourceViewQt
 
 
-_default_task = Task("", Importance.Important, Immediate)
+_default_task = Task("", Importance.Important, date.today())
 
 
 class TaskCreatorDialogQt(QtWidgets.QDialog):
@@ -26,14 +26,11 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         importance_buttons_layout.addWidget(self._important_button)
         importance_buttons_layout.addWidget(unimportant_button)
         due_buttons_box = QtWidgets.QGroupBox(self)
-        self._immediate_due_button = QtWidgets.QRadioButton(
-            "Immediate", due_buttons_box)
         self._due_date_button = QtWidgets.QRadioButton(
             "Due date", due_buttons_box)
         self._no_due_button = QtWidgets.QRadioButton(
             "No due date", due_buttons_box)
         due_buttons_layout = QtWidgets.QHBoxLayout(due_buttons_box)
-        due_buttons_layout.addWidget(self._immediate_due_button)
         due_buttons_layout.addWidget(self._due_date_button)
         due_buttons_layout.addWidget(self._no_due_button)
         self._due_date_widget = QtWidgets.QCalendarWidget(self)
@@ -72,9 +69,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
             self._important_button.setChecked(True)
         else:
             self._unimportant_button.setChecked(True)
-        if task.due == Immediate:
-            self._immediate_due_button.setChecked(True)
-        elif task.due is None:
+        if task.due is None:
             self._no_due_button.setChecked(True)
         else:
             self._due_date_button.setChecked(True)
@@ -90,9 +85,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         importance: Importance = Importance.Important \
             if self._important_button.isChecked() else Importance.Unimportant
         if self._no_due_button.isChecked():
-            due: Optional[DueDate] = None
-        elif self._immediate_due_button.isChecked():
-            due = Immediate
+            due: Optional[date] = None
         else:
             due = self._due_date_widget.selectedDate()
         if self._no_snooze_button.isChecked():

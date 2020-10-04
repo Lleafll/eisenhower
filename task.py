@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from datetime import date
-from typing import Optional, Iterable, Tuple, List, Union
+from typing import Optional, Iterable, Tuple, List
 from enum import Enum, auto
 
 
@@ -11,19 +11,10 @@ class Importance(Enum):
 
 
 @dataclass(frozen=True)
-class ImmediateType:
-    pass
-
-
-Immediate = ImmediateType()
-DueDate = Union[date, ImmediateType]
-
-
-@dataclass(frozen=True)
 class Task:
     name: str
     importance: Importance
-    due: Optional[DueDate] = None
+    due: Optional[date] = None
     snooze: Optional[date] = None
     completed: Optional[date] = None
     resources: List[Path] = field(default_factory=list)

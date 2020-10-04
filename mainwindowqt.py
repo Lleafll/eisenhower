@@ -1,22 +1,20 @@
+from typing import Optional
+from pathlib import Path
+from dataclasses import dataclass
+from datetime import date
+from itertools import filterfalse
 from PySide2 import QtWidgets, QtGui, QtCore
 from task import (
     Task,
     is_completed,
     has_due_date,
     is_important,
-    DueDate,
-    Immediate,
     Importance)
 from taskmanager import (
     TaskManager, load_task_manager, save_task_manager)
-from typing import Optional
-from pathlib import Path
-from dataclasses import dataclass
-from datetime import date
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
 from treeviewwithcontextmenu import (
     TreeViewWithContextMenu, build_tree_view_model, Column)
-from itertools import filterfalse
 from taskcreatordialogqt import TaskCreatorDialogQt
 
 
@@ -88,8 +86,6 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
             task_list.add_task_requested.connect(self._add_task)
-            task_list.set_immediate_requested.connect(
-                lambda task: self._set_due(task, Immediate))
             task_list.set_important_requested.connect(
                 lambda task: self._set_importance(
                     task, Importance.Important))
@@ -206,7 +202,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.rename(task, name)
         self._update_and_save()
 
-    def _set_due(self, task: Task, due: Optional[DueDate] = None) -> None:
+    def _set_due(self, task: Task, due: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.schedule(task, due)

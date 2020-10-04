@@ -1,15 +1,13 @@
+from typing import Optional, Iterable, Sequence
+from datetime import date
+from enum import Enum, auto
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import (
         Task,
         has_due_date,
         has_snoozed_date,
         is_completed,
-        Immediate,
-        DueDate,
         Importance)
-from typing import Optional, Iterable, Sequence
-from datetime import date
-from enum import Enum, auto
 
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
@@ -25,7 +23,6 @@ class Column(Enum):
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
     add_task_requested = QtCore.Signal()
     complete_task_requested = QtCore.Signal(Task)
-    set_immediate_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
     remove_due_requested = QtCore.Signal(Task)
@@ -94,11 +91,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                     remove_due_action.triggered.connect(
                         lambda: self.remove_due_requested.emit(task))
                     context_menu.addAction(remove_due_action)
-                if task.due is not Immediate:
-                    set_immediate_action = QtWidgets.QAction("Set Immediate")
-                    set_immediate_action.triggered.connect(
-                        lambda: self.set_immediate_requested.emit(task))
-                    context_menu.addAction(set_immediate_action)
             if has_snoozed_date(
                     task) and Column.Snoozed in self._displayed_columns:
                 remove_snooze_action = QtWidgets.QAction("Remove Snooze")
@@ -132,18 +124,15 @@ def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:
     return QtCore.QDate(task_date.year, task_date.month, task_date.day)
 
 
-def _build_date_item(date: Optional[date]) -> QtGui.QStandardItem:
-    qdate = _date_to_qdate(date)
+def _build_date_item(date_: Optional[date]) -> QtGui.QStandardItem:
+    qdate = _date_to_qdate(date_)
     item = QtGui.QStandardItem()
     item.setData(qdate, QtCore.Qt.DisplayRole)
     return item
 
 
-def _build_due_date_item(date: Optional[DueDate]) -> QtGui.QStandardItem:
-    if date == Immediate:
-        return _build_date_item(None)
-    else:
-        return _build_date_item(date)  # type: ignore
+def _build_due_date_item(date_: Optional[date]) -> QtGui.QStandardItem:
+    return _build_date_item(date_)  # type: ignore
 
 
 def _build_row(
