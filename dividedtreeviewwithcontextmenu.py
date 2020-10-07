@@ -1,6 +1,6 @@
+from PySide2 import QtWidgets, QtCore, QtGui
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
-from PySide2 import QtWidgets, QtCore, QtGui
 from task import Task, sort_tasks_by_relevance
 from typing import Sequence
 from datetime import date
@@ -45,7 +45,7 @@ class ItemWordWrap(QtWidgets.QStyledItemDelegate):
     def sizeHint(
             self,
             option: QtWidgets.QStyleOption,
-            index: QtCore.QModelIndex) -> None:
+            index: QtCore.QModelIndex) -> int:
         size = super().sizeHint(option, index)
         size.setHeight(35)
         return size
@@ -57,7 +57,6 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     delete_task_requested = QtCore.Signal(Task)
     rename_task_requested = QtCore.Signal(Task, str)
     schedule_task_requested = QtCore.Signal(Task, date)
-    set_immediate_requested = QtCore.Signal(Task)
     snooze_task_requested = QtCore.Signal(Task, date)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
@@ -98,8 +97,6 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list.remove_due_requested.connect(self.remove_due_requested)
             task_list.remove_snooze_requested.connect(
                     self.remove_snooze_requested)
-            task_list.set_immediate_requested.connect(
-                    self.set_immediate_requested)
             task_list.set_important_requested.connect(
                     self.set_important_requested)
             task_list.set_unimportant_requested.connect(
