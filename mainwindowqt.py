@@ -49,16 +49,20 @@ class MainWindowQt(QtWidgets.QWidget):
         self._redo_button = QtWidgets.QPushButton("Redo")
         self._add_task_button = QtWidgets.QPushButton("Add Task")
         self._show_archive_button = QtWidgets.QPushButton("Show Archive")
+        self._priority_button = QtWidgets.QPushButton("Priority Mode")
+        self._priority_button.setCheckable(True)
         _style_button(self._undo_button)
         _style_button(self._redo_button)
         _style_button(self._add_task_button)
         _style_button(self._show_archive_button)
+        _style_button(self._priority_button)
         button_layout = QtWidgets.QVBoxLayout()
         layout.addLayout(button_layout)
         button_layout.addWidget(self._add_task_button)
         button_layout.addWidget(self._undo_button)
         button_layout.addWidget(self._redo_button)
         button_layout.addWidget(self._show_archive_button)
+        button_layout.addWidget(self._priority_button)
         button_layout.addStretch()
         self._do_list = SeparatedTreeViewWithContextMenu(
             "Do", QtGui.QColor(240, 98, 146), self)
@@ -97,6 +101,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._redo_button.clicked.connect(self._redo)
         self._add_task_button.clicked.connect(self._add_task)
         self._show_archive_button.clicked.connect(self._show_archive)
+        self._priority_button.toggled.connect(self._toggle_priority)
         self._archive_view = TreeViewWithContextMenu(
             (Column.Name, Column.Archived),
             QtGui.QColor(255, 255, 255),
@@ -240,6 +245,13 @@ class MainWindowQt(QtWidgets.QWidget):
             return
         self._task_manager.instance.set_complete(task, False)
         self._update_and_save()
+
+    def _toggle_priority(self, is_toggled: bool) -> None:
+        if self._task_manager is None:
+            return
+        for task_list in (
+                self._decide_list, self._delegate_list, self._drop_list):
+            task_list.setHidden(is_toggled)
 
 
 def _is_do_task(task: Task) -> bool:
