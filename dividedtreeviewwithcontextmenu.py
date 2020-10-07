@@ -38,7 +38,7 @@ class ItemWordWrap(QtWidgets.QStyledItemDelegate):
     def sizeHint(
             self,
             option: QtWidgets.QStyleOption,
-            index: QtCore.QModelIndex) -> int:
+            index: QtCore.QModelIndex) -> QtCore.QSize:
         size = super().sizeHint(option, index)
         size.setHeight(35)
         return size
