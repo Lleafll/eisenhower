@@ -1,9 +1,9 @@
-from PySide2 import QtWidgets
-from mainwindowqt import MainWindowQt
 import sys
 from argparse import ArgumentParser
 from pathlib import Path
 from typing import Optional
+from PySide2 import QtWidgets
+from mainwindowqt import MainWindowQt
 
 
 def _parse_argv() -> Optional[Path]:
