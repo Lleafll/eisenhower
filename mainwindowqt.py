@@ -249,6 +249,7 @@ class MainWindowQt(QtWidgets.QWidget):
     def _toggle_priority(self, is_toggled: bool) -> None:
         if self._task_manager is None:
             return
+        self._do_list.show_snoozed_tasks(not is_toggled)
         for task_list in (
                 self._decide_list, self._delegate_list, self._drop_list):
             task_list.setHidden(is_toggled)
