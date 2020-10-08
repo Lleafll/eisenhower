@@ -105,6 +105,9 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             self._upper_list, due_tasks + normal_tasks, self)
         _build_model_and_connect(self._lower_list, snoozed_tasks, self)
 
+    def show_snoozed_tasks(self, should_show: bool = True) -> None:
+        self._lower_list.setVisible(should_show)
+
     def _item_changed(
             self,
             task_list: TreeViewWithContextMenu,
