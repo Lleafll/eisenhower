@@ -103,5 +103,4 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         success = dialog.exec_()
         if success == QtWidgets.QDialog.Accepted:
             return dialog.task()
-        else:
-            return None
+        return None
