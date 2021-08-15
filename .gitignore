@@ -7,3 +7,4 @@ test.todo
 /tags
 *.py1.stats
 /.idea/
+/venv/
