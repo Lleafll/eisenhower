@@ -11,6 +11,14 @@ class Importance(Enum):
 
 
 @dataclass(frozen=True)
+class SubTask:
+    name: str
+    due: Optional[date] = None
+    snooze: Optional[date] = None
+    completed: bool = False
+
+
+@dataclass(frozen=True)
 class Task:
     name: str
     importance: Importance
@@ -18,6 +26,7 @@ class Task:
     snooze: Optional[date] = None
     completed: Optional[date] = None
     resources: List[Path] = field(default_factory=list)
+    sub_tasks: List[SubTask] = field(default_factory=list)
 
 
 def has_due_date(task: Task) -> bool:
