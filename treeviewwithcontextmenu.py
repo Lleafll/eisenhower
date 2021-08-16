@@ -43,7 +43,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
-        self.setRootIsDecorated(False)
+        self.setRootIsDecorated(True)
         self.setEditTriggers(
                 QtWidgets.QAbstractItemView.EditKeyPressed |
                 QtWidgets.QAbstractItemView.AnyKeyPressed |
@@ -159,8 +159,10 @@ def _build_row(
             raise RuntimeError("Unhandled column")
         item.setData(task, role=TASK_ROLE)
         items.append(item)
+    for sub_task in task.sub_tasks:
+        row = _build_sub_task_row(sub_task, columns)
+        items[0].appendRow(row)
     return items
-
 
 
 def _build_sub_task_row(
@@ -189,12 +191,10 @@ def _set_rows(
         model: QtGui.QStandardItemModel,
         columns: Sequence[Column],
         tasks: Iterable[Task]) -> None:
+    root_item = model.invisibleRootItem()
     for task in tasks:
         row = _build_row(task, columns)
-        model.appendRow(row)
-        for sub_task in task.sub_tasks:
-            row = _build_sub_task_row(sub_task, columns)
-            model.appendRow(row)
+        root_item.appendRow(row)
 
 
 def _set_header(
