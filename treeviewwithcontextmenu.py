@@ -3,11 +3,11 @@ from datetime import date
 from enum import Enum, auto
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import (
-        Task,
-        has_due_date,
-        has_snoozed_date,
-        is_completed,
-        Importance)
+    Task,
+    has_due_date,
+    has_snoozed_date,
+    is_completed,
+    Importance, SubTask)
 
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
@@ -22,6 +22,7 @@ class Column(Enum):
 
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
     add_task_requested = QtCore.Signal()
+    add_sub_task_requested = QtCore.Signal(Task)
     complete_task_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
@@ -75,6 +76,10 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             rename_action.triggered.connect(lambda: self.edit(index))
             context_menu.addAction(rename_action)
             task: Task = index.data(TASK_ROLE)
+            add_sub_task = QtWidgets.QAction("Add Subtask")
+            add_sub_task.triggered.connect(
+                    lambda: self.add_sub_task_requested.emit(task))
+            context_menu.addAction(add_sub_task)
             if task.importance == Importance.Important:
                 set_unimportant_task = QtWidgets.QAction("Make Unimportant")
                 set_unimportant_task.triggered.connect(
@@ -157,6 +162,29 @@ def _build_row(
     return items
 
 
+
+def _build_sub_task_row(
+        task: SubTask,
+        columns: Sequence[Column]) -> Sequence[QtGui.QStandardItem]:
+    items = []
+    for column in columns:
+        if column == Column.Name:
+            item = QtGui.QStandardItem(task.name)
+        elif column == Column.Due:
+            item = _build_due_date_item(task.due)
+        elif column == Column.Snoozed:
+            item = _build_date_item(
+                task.snooze if has_snoozed_date(task) else None)
+        elif column == Column.Archived:
+            item = _build_date_item(task.completed)
+            item.setEditable(False)
+        else:
+            raise RuntimeError("Unhandled column")
+        item.setData(task, role=TASK_ROLE)
+        items.append(item)
+    return items
+
+
 def _set_rows(
         model: QtGui.QStandardItemModel,
         columns: Sequence[Column],
@@ -164,6 +192,9 @@ def _set_rows(
     for task in tasks:
         row = _build_row(task, columns)
         model.appendRow(row)
+        for sub_task in task.sub_tasks:
+            row = _build_sub_task_row(sub_task, columns)
+            model.appendRow(row)
 
 
 def _set_header(

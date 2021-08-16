@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from datetime import date
-from typing import Optional, Iterable, Tuple, List
+from typing import Optional, Iterable, Tuple, List, Union
 from enum import Enum, auto
 
 
@@ -15,7 +15,7 @@ class SubTask:
     name: str
     due: Optional[date] = None
     snooze: Optional[date] = None
-    completed: bool = False
+    completed: Optional[date] = False
 
 
 @dataclass(frozen=True)
@@ -33,7 +33,7 @@ def has_due_date(task: Task) -> bool:
     return task.due is not None
 
 
-def has_snoozed_date(task: Task) -> bool:
+def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
     if task.snooze is None:
         return False
     return task.snooze > date.today()
