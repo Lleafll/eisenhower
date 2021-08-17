@@ -26,8 +26,11 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     complete_task_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
+    delete_sub_task_requested = QtCore.Signal(SubTask)
     remove_due_requested = QtCore.Signal(Task)
+    remove_due_from_sub_task_requested = QtCore.Signal(SubTask)
     remove_snooze_requested = QtCore.Signal(Task)
+    remove_snooze_from_sub_task_requested = QtCore.Signal(Task)
     set_important_requested = QtCore.Signal(Task)
     set_unimportant_requested = QtCore.Signal(Task)
     task_view_requested = QtCore.Signal(Task)
@@ -127,8 +130,24 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             lambda: self.delete_task_requested.emit(task))
         context_menu.addAction(delete_action)
 
-    def _fill_context_menu_sub_task(self) -> None:
-        pass
+    def _fill_context_menu_sub_task(
+            self, context_menu: QtWidgets.QMenu, sub_task: SubTask) -> None:
+        if Column.Due in self._displayed_columns:
+            if has_due_date(sub_task):
+                remove_due_action = QtWidgets.QAction("Remove Due")
+                remove_due_action.triggered.connect(
+                    lambda: self.remove_due_from_sub_task_requested.emit(sub_task))
+                context_menu.addAction(remove_due_action)
+        if has_snoozed_date(
+                sub_task) and Column.Snoozed in self._displayed_columns:
+            remove_snooze_action = QtWidgets.QAction("Remove Snooze")
+            remove_snooze_action.triggered.connect(
+                lambda: self.remove_snooze_from_sub_task_requested.emit(sub_task))
+            context_menu.addAction(remove_snooze_action)
+        delete_action = QtWidgets.QAction("Delete")
+        delete_action.triggered.connect(
+            lambda: self.delete_sub_task_requested.emit(sub_task))
+        context_menu.addAction(delete_action)
 
 
 def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:

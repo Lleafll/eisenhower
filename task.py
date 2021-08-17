@@ -29,7 +29,7 @@ class Task:
     sub_tasks: List[SubTask] = field(default_factory=list)
 
 
-def has_due_date(task: Task) -> bool:
+def has_due_date(task: Union[Task, SubTask]) -> bool:
     return task.due is not None
 
 
@@ -39,7 +39,7 @@ def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
     return task.snooze > date.today()
 
 
-def is_completed(task: Task) -> bool:
+def is_completed(task: Union[Task, SubTask]) -> bool:
     return task.completed is not None
 
 
