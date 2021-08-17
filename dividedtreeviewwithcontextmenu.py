@@ -134,6 +134,7 @@ def _build_model_and_connect(
         view: SeparatedTreeViewWithContextMenu) -> None:
     model = build_tree_view_model(task_list.columns(), tasks)
     task_list.setModel(model)
+    task_list.expandAll()
     header = task_list.header()
     header.setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeMode.Stretch)
     for i in range(1, 3):

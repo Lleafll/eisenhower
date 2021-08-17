@@ -64,6 +64,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.header().setSortIndicatorShown(True)
         self.header().setSectionsClickable(True)
         self.setSortingEnabled(True)
+        self.setItemsExpandable(False)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
@@ -126,7 +127,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             lambda: self.delete_task_requested.emit(task))
         context_menu.addAction(delete_action)
 
-    def _fill_context_menu_sub_task(self):
+    def _fill_context_menu_sub_task(self) -> None:
         pass
 
 
