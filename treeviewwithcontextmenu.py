@@ -1,13 +1,13 @@
-from typing import Optional, Iterable, Sequence
+from typing import Optional, Iterable, Sequence, Union
 from datetime import date
 from enum import Enum, auto
 from PySide2 import QtWidgets, QtCore, QtGui
 from task import (
-        Task,
-        has_due_date,
-        has_snoozed_date,
-        is_completed,
-        Importance)
+    Task,
+    has_due_date,
+    has_snoozed_date,
+    is_completed,
+    Importance, SubTask)
 
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
@@ -22,6 +22,7 @@ class Column(Enum):
 
 class TreeViewWithContextMenu(QtWidgets.QTreeView):
     add_task_requested = QtCore.Signal()
+    add_sub_task_requested = QtCore.Signal(Task)
     complete_task_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
@@ -42,7 +43,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
-        self.setRootIsDecorated(False)
+        self.setRootIsDecorated(True)
         self.setEditTriggers(
                 QtWidgets.QAbstractItemView.EditKeyPressed |
                 QtWidgets.QAbstractItemView.AnyKeyPressed |
@@ -63,6 +64,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.header().setSortIndicatorShown(True)
         self.header().setSectionsClickable(True)
         self.setSortingEnabled(True)
+        self.setItemsExpandable(False)
 
     def columns(self) -> Sequence[Column]:
         return self._displayed_columns
@@ -74,46 +76,59 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             rename_action = QtWidgets.QAction("Change")
             rename_action.triggered.connect(lambda: self.edit(index))
             context_menu.addAction(rename_action)
-            task: Task = index.data(TASK_ROLE)
-            if task.importance == Importance.Important:
-                set_unimportant_task = QtWidgets.QAction("Make Unimportant")
-                set_unimportant_task.triggered.connect(
-                        lambda: self.set_unimportant_requested.emit(task))
-                context_menu.addAction(set_unimportant_task)
+            task: Union[Task, SubTask] = index.data(TASK_ROLE)
+            if isinstance(task, Task):
+                self._fill_context_menu_task(context_menu, task)
             else:
-                set_important_task = QtWidgets.QAction("Make Important")
-                set_important_task.triggered.connect(
-                        lambda: self.set_important_requested.emit(task))
-                context_menu.addAction(set_important_task)
-            if Column.Due in self._displayed_columns:
-                if has_due_date(task):
-                    remove_due_action = QtWidgets.QAction("Remove Due")
-                    remove_due_action.triggered.connect(
-                        lambda: self.remove_due_requested.emit(task))
-                    context_menu.addAction(remove_due_action)
-            if has_snoozed_date(
-                    task) and Column.Snoozed in self._displayed_columns:
-                remove_snooze_action = QtWidgets.QAction("Remove Snooze")
-                remove_snooze_action.triggered.connect(
-                    lambda: self.remove_snooze_requested.emit(task))
-                context_menu.addAction(remove_snooze_action)
-            if is_completed(task):
-                if Column.Archived in self._displayed_columns:
-                    unarchive_action = QtWidgets.QAction("Unarchive")
-                    unarchive_action.triggered.connect(
-                        lambda: self.unarchive_task_requested.emit(task))
-                    context_menu.addAction(unarchive_action)
-            else:
-                complete_action = QtWidgets.QAction("Complete")
-                complete_action.triggered.connect(
-                    lambda: self.complete_task_requested.emit(task))
-                context_menu.addAction(complete_action)
-            delete_action = QtWidgets.QAction("Delete")
-            delete_action.triggered.connect(
-                lambda: self.delete_task_requested.emit(task))
-            context_menu.addAction(delete_action)
+                self._fill_context_menu_sub_task()
         if len(context_menu.actions()) > 0:
             context_menu.exec_(self.viewport().mapToGlobal(point))
+
+    def _fill_context_menu_task(self, context_menu: QtWidgets.QMenu, task: Task):
+        add_sub_task = QtWidgets.QAction("Add Subtask")
+        add_sub_task.triggered.connect(
+            lambda: self.add_sub_task_requested.emit(task))
+        context_menu.addAction(add_sub_task)
+        if task.importance == Importance.Important:
+            set_unimportant_task = QtWidgets.QAction("Make Unimportant")
+            set_unimportant_task.triggered.connect(
+                lambda: self.set_unimportant_requested.emit(task))
+            context_menu.addAction(set_unimportant_task)
+        else:
+            set_important_task = QtWidgets.QAction("Make Important")
+            set_important_task.triggered.connect(
+                lambda: self.set_important_requested.emit(task))
+            context_menu.addAction(set_important_task)
+        if Column.Due in self._displayed_columns:
+            if has_due_date(task):
+                remove_due_action = QtWidgets.QAction("Remove Due")
+                remove_due_action.triggered.connect(
+                    lambda: self.remove_due_requested.emit(task))
+                context_menu.addAction(remove_due_action)
+        if has_snoozed_date(
+                task) and Column.Snoozed in self._displayed_columns:
+            remove_snooze_action = QtWidgets.QAction("Remove Snooze")
+            remove_snooze_action.triggered.connect(
+                lambda: self.remove_snooze_requested.emit(task))
+            context_menu.addAction(remove_snooze_action)
+        if is_completed(task):
+            if Column.Archived in self._displayed_columns:
+                unarchive_action = QtWidgets.QAction("Unarchive")
+                unarchive_action.triggered.connect(
+                    lambda: self.unarchive_task_requested.emit(task))
+                context_menu.addAction(unarchive_action)
+        else:
+            complete_action = QtWidgets.QAction("Complete")
+            complete_action.triggered.connect(
+                lambda: self.complete_task_requested.emit(task))
+            context_menu.addAction(complete_action)
+        delete_action = QtWidgets.QAction("Delete")
+        delete_action.triggered.connect(
+            lambda: self.delete_task_requested.emit(task))
+        context_menu.addAction(delete_action)
+
+    def _fill_context_menu_sub_task(self) -> None:
+        pass
 
 
 def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:
@@ -154,6 +169,31 @@ def _build_row(
             raise RuntimeError("Unhandled column")
         item.setData(task, role=TASK_ROLE)
         items.append(item)
+    for sub_task in task.sub_tasks:
+        row = _build_sub_task_row(sub_task, columns)
+        items[0].appendRow(row)
+    return items
+
+
+def _build_sub_task_row(
+        task: SubTask,
+        columns: Sequence[Column]) -> Sequence[QtGui.QStandardItem]:
+    items = []
+    for column in columns:
+        if column == Column.Name:
+            item = QtGui.QStandardItem(task.name)
+        elif column == Column.Due:
+            item = _build_due_date_item(task.due)
+        elif column == Column.Snoozed:
+            item = _build_date_item(
+                task.snooze if has_snoozed_date(task) else None)
+        elif column == Column.Archived:
+            item = _build_date_item(task.completed)
+            item.setEditable(False)
+        else:
+            raise RuntimeError("Unhandled column")
+        item.setData(task, role=TASK_ROLE)
+        items.append(item)
     return items
 
 
@@ -161,9 +201,10 @@ def _set_rows(
         model: QtGui.QStandardItemModel,
         columns: Sequence[Column],
         tasks: Iterable[Task]) -> None:
+    root_item = model.invisibleRootItem()
     for task in tasks:
         row = _build_row(task, columns)
-        model.appendRow(row)
+        root_item.appendRow(row)
 
 
 def _set_header(

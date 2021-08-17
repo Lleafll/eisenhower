@@ -90,6 +90,7 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
             task_list.add_task_requested.connect(self._add_task)
+            task_list.add_sub_task_requested.connect(self._add_sub_task)
             task_list.set_important_requested.connect(
                 lambda task: self._set_importance(
                     task, Importance.Important))
@@ -178,6 +179,12 @@ class MainWindowQt(QtWidgets.QWidget):
         if task is None:
             return
         self._task_manager.instance.add(task)
+        self._update_and_save()
+
+    def _add_sub_task(self, task: Task) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.add_sub_task(task)
         self._update_and_save()
 
     def _open_task(self, task: Task) -> None:

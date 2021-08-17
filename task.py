@@ -1,13 +1,21 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 from datetime import date
-from typing import Optional, Iterable, Tuple, List
+from typing import Optional, Iterable, Tuple, List, Union
 from enum import Enum, auto
 
 
 class Importance(Enum):
     Important = auto()
     Unimportant = auto()
+
+
+@dataclass(frozen=True)
+class SubTask:
+    name: str
+    due: Optional[date] = None
+    snooze: Optional[date] = None
+    completed: Optional[date] = False
 
 
 @dataclass(frozen=True)
@@ -18,13 +26,14 @@ class Task:
     snooze: Optional[date] = None
     completed: Optional[date] = None
     resources: List[Path] = field(default_factory=list)
+    sub_tasks: List[SubTask] = field(default_factory=list)
 
 
 def has_due_date(task: Task) -> bool:
     return task.due is not None
 
 
-def has_snoozed_date(task: Task) -> bool:
+def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
     if task.snooze is None:
         return False
     return task.snooze > date.today()

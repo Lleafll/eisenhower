@@ -3,7 +3,7 @@ from datetime import date
 from dataclasses import replace
 from pickle import load, dump
 from pathlib import Path
-from task import Task, Importance
+from task import Task, Importance, SubTask
 from history import History, Tasks
 
 
@@ -17,6 +17,10 @@ class TaskManager:
     def add(self, task: Task) -> None:
         tasks = self._history.advance_history()
         tasks.append(task)
+
+    def add_sub_task(self, task: Task) -> None:
+        self._history.advance_history()
+        task.sub_tasks.append(SubTask("New Subtask"))
 
     def delete(self, task: Task) -> None:
         tasks = self._history.advance_history()
@@ -95,6 +99,15 @@ def load_task_manager(import_path: Path) -> TaskManager:
             tasks: Tasks = load(file)
     except FileNotFoundError:
         tasks = []
+    for i, task in enumerate(tasks):
+        if not hasattr(task, "sub_tasks"):
+            tasks[i] = Task(
+                task.name,
+                task.importance,
+                task.due,
+                task.snooze,
+                task.completed,
+                task.resources)
     return TaskManager(tasks)
 
 
