@@ -3,7 +3,7 @@ from datetime import date
 from PySide2 import QtWidgets, QtCore, QtGui
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
-from task import Task, sort_tasks_by_relevance
+from task import Task, sort_tasks_by_relevance, SubTask
 
 
 class CalendarDelegate(QtWidgets.QStyledItemDelegate):
@@ -50,8 +50,11 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
     rename_task_requested = QtCore.Signal(Task, str)
+    rename_sub_task_requested = QtCore.Signal(SubTask, str)
     schedule_task_requested = QtCore.Signal(Task, date)
+    schedule_sub_task_requested = QtCore.Signal(SubTask, date)
     snooze_task_requested = QtCore.Signal(Task, date)
+    snooze_sub_task_requested = QtCore.Signal(SubTask, date)
     remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
     set_important_requested = QtCore.Signal(Task)
@@ -115,8 +118,17 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list: TreeViewWithContextMenu,
             item: QtGui.QStandardItem) -> None:
         task = item.data(TASK_ROLE)
-        column_index = item.column()
-        column = task_list.columns()[column_index]
+        column = task_list.columns()[item.column()]
+        if isinstance(task, Task):
+            self._task_item_changed(item, task, column)
+        else:
+            self._sub_task_item_changed(item, task, column)
+
+    def _task_item_changed(
+            self,
+            item: QtGui.QStandardItem,
+            task: Task,
+            column: Column) -> None:
         if column == Column.Name:
             new_name = item.data(QtCore.Qt.DisplayRole)
             self.rename_task_requested.emit(task, new_name)
@@ -126,6 +138,21 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         elif column == Column.Snoozed:
             snoozed = item.data(QtCore.Qt.DisplayRole)
             self.snooze_task_requested.emit(task, snoozed)
+
+    def _sub_task_item_changed(
+            self,
+            item: QtGui.QStandardItem,
+            sub_task: SubTask,
+            column: Column) -> None:
+        if column == Column.Name:
+            new_name = item.data(QtCore.Qt.DisplayRole)
+            self.rename_sub_task_requested.emit(sub_task, new_name)
+        elif column == Column.Due:
+            due = item.data(QtCore.Qt.DisplayRole)
+            self.schedule_sub_task_requested.emit(sub_task, due)
+        elif column == Column.Snoozed:
+            snoozed = item.data(QtCore.Qt.DisplayRole)
+            self.snooze_sub_task_requested.emit(sub_task, snoozed)
 
 
 def _build_model_and_connect(

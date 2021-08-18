@@ -83,7 +83,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
             if isinstance(task, Task):
                 self._fill_context_menu_task(context_menu, task)
             else:
-                self._fill_context_menu_sub_task()
+                self._fill_context_menu_sub_task(context_menu, task)
         if len(context_menu.actions()) > 0:
             context_menu.exec_(self.viewport().mapToGlobal(point))
 

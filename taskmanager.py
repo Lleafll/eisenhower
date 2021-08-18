@@ -40,15 +40,30 @@ class TaskManager:
         new_task = replace(task, due=due)
         _replace(tasks, task, new_task)
 
+    def schedule_sub_task(self, sub_task: SubTask, due: Optional[date]) -> None:
+        tasks = self._history.advance_history()
+        new_task = replace(sub_task, due=due)
+        _replace_sub_task(tasks, sub_task, new_task)
+
     def snooze(self, task: Task, time: Optional[date]) -> None:
         tasks = self._history.advance_history()
         new_task = replace(task, snooze=time)
         _replace(tasks, task, new_task)
 
+    def snooze_sub_task(self, task: SubTask, time: Optional[date]) -> None:
+        tasks = self._history.advance_history()
+        new_task = replace(task, snooze=time)
+        _replace_sub_task(tasks, task, new_task)
+
     def rename(self, task: Task, new_name: str) -> None:
         tasks = self._history.advance_history()
         new_task = replace(task, name=new_name)
         _replace(tasks, task, new_task)
+
+    def rename_sub_task(self, sub_task: SubTask, new_name: str) -> None:
+        tasks = self._history.advance_history()
+        new_task = replace(sub_task, name=new_name)
+        _replace_sub_task(tasks, sub_task, new_task)
 
     def set_importance(self, task: Task, importance: Importance) -> None:
         tasks = self._history.advance_history()
@@ -89,6 +104,20 @@ def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
     try:
         index = tasks.index(old_task)
         tasks[index] = new_task
+    except ValueError:
+        pass
+
+
+def _replace_sub_task(
+        tasks: Tasks,
+        old_sub_task: SubTask,
+        new_sub_task: SubTask) -> None:
+    try:
+        for task in tasks:
+            sub_tasks = task.sub_tasks
+            if old_sub_task in sub_tasks:
+                index = sub_tasks.index(old_sub_task)
+                sub_tasks[index] = new_sub_task
     except ValueError:
         pass
 

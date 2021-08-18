@@ -9,7 +9,7 @@ from task import (
     is_completed,
     has_due_date,
     is_important,
-    Importance)
+    Importance, SubTask)
 from taskmanager import (
     TaskManager, load_task_manager, save_task_manager)
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
@@ -85,8 +85,11 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.complete_task_requested.connect(self._complete_task)
             task_list.delete_task_requested.connect(self._delete_task)
             task_list.rename_task_requested.connect(self._rename_task)
+            task_list.rename_sub_task_requested.connect(self._rename_sub_task)
             task_list.schedule_task_requested.connect(self._set_due)
+            task_list.schedule_sub_task_requested.connect(self._set_sub_task_due)
             task_list.snooze_task_requested.connect(self._set_snooze)
+            task_list.snooze_sub_task_requested.connect(self._set_sub_task_snooze)
             task_list.remove_due_requested.connect(self._set_due)
             task_list.remove_snooze_requested.connect(self._set_snooze)
             task_list.add_task_requested.connect(self._add_task)
@@ -214,16 +217,34 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.rename(task, name)
         self._update_and_save()
 
+    def _rename_sub_task(self, sub_task: SubTask, name: str) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.rename_sub_task(sub_task, name)
+        self._update_and_save()
+
     def _set_due(self, task: Task, due: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.schedule(task, due)
         self._update_and_save()
 
+    def _set_sub_task_due(self, task: SubTask, due: Optional[date] = None) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.schedule_sub_task(task, due)
+        self._update_and_save()
+
     def _set_snooze(self, task: Task, snooze: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.snooze(task, snooze)
+        self._update_and_save()
+
+    def _set_sub_task_snooze(self, task: SubTask, snooze: Optional[date] = None) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.snooze_sub_task(task, snooze)
         self._update_and_save()
 
     def _set_importance(self, task: Task, importance: Importance) -> None:
