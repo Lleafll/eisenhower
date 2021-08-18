@@ -12,7 +12,7 @@ class Importance(Enum):
 
 @dataclass(frozen=True)
 class SubTask:
-    name: str
+    name: str = "SubTask"
     due: Optional[date] = None
     snooze: Optional[date] = None
     completed: Optional[date] = False
@@ -20,13 +20,26 @@ class SubTask:
 
 @dataclass(frozen=True)
 class Task:
-    name: str
-    importance: Importance
-    due: Optional[date] = None
-    snooze: Optional[date] = None
-    completed: Optional[date] = None
+    name: str = "Task"
+    importance: Importance = Importance.Unimportant
     resources: List[Path] = field(default_factory=list)
     sub_tasks: List[SubTask] = field(default_factory=list)
+    version: int = 2
+
+    @property
+    def snooze(self) -> Optional[date]:
+        try:
+            return min(map(lambda sub_task: sub_task.snooze, self.sub_tasks))
+        except ValueError:
+            return None
+
+    @property
+    def due(self) -> Optional[date]:
+        pass
+
+    @property
+    def completed(self) -> Optional[date]:
+        pass
 
 
 def has_due_date(task: Union[Task, SubTask]) -> bool:
