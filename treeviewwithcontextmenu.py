@@ -139,8 +139,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                 delete_action.triggered.connect(
                     lambda: self.delete_sub_task_requested.emit(task))
                 context_menu.addAction(delete_action)
-        # DEBUG
-        length = len(context_menu.actions())
         if len(context_menu.actions()) > 0:
             context_menu.exec_(self.viewport().mapToGlobal(point))
 
