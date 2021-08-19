@@ -25,25 +25,6 @@ class TestTask(TestCase):
             SubTask(snooze=None)])
         self.assertEqual(task.snooze, date(3, 4, 5))
 
-    def test_completed_empty_task(self):
-        task = Task()
-        self.assertIsNone(task.completed)
-
-    def test_completed_one_uncompleted_tasks(self):
-        task = Task(sub_tasks=[
-            SubTask(completed=date(9, 10, 11)),
-            SubTask(completed=date(3, 4, 5)),
-            SubTask(completed=date(6, 7, 8)),
-            SubTask(completed=None)])
-        self.assertIsNone(task.completed)
-
-    def test_completed_several_completed_tasks(self):
-        task = Task(sub_tasks=[
-            SubTask(completed=date(9, 10, 11)),
-            SubTask(completed=date(3, 4, 5)),
-            SubTask(completed=date(6, 7, 8))])
-        self.assertEqual(task.completed, date(9, 10, 11))
-
     def test_due_empty_task(self):
         task = Task()
         self.assertIsNone(task.due)

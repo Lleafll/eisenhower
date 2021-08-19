@@ -15,7 +15,6 @@ class SubTask:
     name: str = "SubTask"
     due: Optional[date] = None
     snooze: Optional[date] = None
-    completed: Optional[date] = None
 
 
 @dataclass(frozen=True)
@@ -24,6 +23,7 @@ class Task:
     importance: Importance = Importance.Unimportant
     resources: List[Path] = field(default_factory=list)
     sub_tasks: List[SubTask] = field(default_factory=list)
+    completed: Optional[date] = None
     version: int = 2
 
     @property
@@ -40,22 +40,13 @@ class Task:
         except ValueError:
             return None
 
-    @property
-    def completed(self) -> Optional[date]:
-        if any(sub_task.completed is None for sub_task in self.sub_tasks):
-            return None
-        else:
-            try:
-                return max([sub_task.completed for sub_task in self.sub_tasks if sub_task.completed is not None])
-            except ValueError:
-                return None
-
 
 def has_due_date(task: Union[Task, SubTask]) -> bool:
     if isinstance(task, Task):
         return (task.due is not None) or (any(i is not None for i in task.sub_tasks))
     else:
         return task.due is not None
+
 
 def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
     if task.snooze is None:
