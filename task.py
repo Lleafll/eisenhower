@@ -42,10 +42,7 @@ class Task:
 
 
 def has_due_date(task: Union[Task, SubTask]) -> bool:
-    if isinstance(task, Task):
-        return (task.due is not None) or (any(i is not None for i in task.sub_tasks))
-    else:
-        return task.due is not None
+    return task.due is not None
 
 
 def has_snoozed_date(task: Union[Task, SubTask]) -> bool:

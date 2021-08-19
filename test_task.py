@@ -47,3 +47,15 @@ class TestTask(TestCase):
     def test_has_due_date_sub_task(self):
         sub_task = SubTask()
         self.assertFalse(has_due_date(sub_task))
+
+    def test_has_due_date_task(self):
+        task = Task()
+        self.assertFalse(has_due_date(task))
+
+    def test_has_due_date_task_with_due_sub_task(self):
+        task = Task(sub_tasks=[SubTask(due=date(5, 3, 2))])
+        self.assertTrue(has_due_date(task))
+
+    def test_has_due_date_task_with_undue_sub_task(self):
+        task = Task(sub_tasks=[SubTask()])
+        self.assertFalse(has_due_date(task))
