@@ -51,12 +51,9 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     delete_task_requested = QtCore.Signal(Task)
     rename_task_requested = QtCore.Signal(Task, str)
     rename_sub_task_requested = QtCore.Signal(SubTask, str)
-    schedule_task_requested = QtCore.Signal(Task, date)
     schedule_sub_task_requested = QtCore.Signal(SubTask, date)
     snooze_task_requested = QtCore.Signal(Task, date)
     snooze_sub_task_requested = QtCore.Signal(SubTask, date)
-    remove_due_requested = QtCore.Signal(Task)
-    remove_snooze_requested = QtCore.Signal(Task)
     set_important_requested = QtCore.Signal(Task)
     set_unimportant_requested = QtCore.Signal(Task)
     task_view_requested = QtCore.Signal(Task)
@@ -92,9 +89,6 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list.complete_task_requested.connect(
                 self.complete_task_requested)
             task_list.delete_task_requested.connect(self.delete_task_requested)
-            task_list.remove_due_requested.connect(self.remove_due_requested)
-            task_list.remove_snooze_requested.connect(
-                self.remove_snooze_requested)
             task_list.set_important_requested.connect(
                 self.set_important_requested)
             task_list.set_unimportant_requested.connect(

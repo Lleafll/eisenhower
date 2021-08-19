@@ -35,20 +35,10 @@ class TaskManager:
         tasks = self._history.advance_history()
         _complete(tasks, task, is_complete)
 
-    def schedule(self, task: Task, due: Optional[date]) -> None:
-        tasks = self._history.advance_history()
-        new_task = replace(task, due=due)
-        _replace(tasks, task, new_task)
-
     def schedule_sub_task(self, sub_task: SubTask, due: Optional[date]) -> None:
         tasks = self._history.advance_history()
         new_task = replace(sub_task, due=due)
         _replace_sub_task(tasks, sub_task, new_task)
-
-    def snooze(self, task: Task, time: Optional[date]) -> None:
-        tasks = self._history.advance_history()
-        new_task = replace(task, snooze=time)
-        _replace(tasks, task, new_task)
 
     def snooze_sub_task(self, task: SubTask, time: Optional[date]) -> None:
         tasks = self._history.advance_history()
