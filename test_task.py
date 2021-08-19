@@ -43,3 +43,22 @@ class TestTask(TestCase):
             SubTask(completed=date(3, 4, 5)),
             SubTask(completed=date(6, 7, 8))])
         self.assertEqual(task.completed, date(9, 10, 11))
+
+    def test_due_empty_task(self):
+        task = Task()
+        self.assertIsNone(task.due)
+
+    def test_due_several_due_tasks(self):
+        task = Task(sub_tasks=[
+            SubTask(due=date(9, 10, 11)),
+            SubTask(due=date(3, 4, 5)),
+            SubTask(due=date(6, 7, 8))])
+        self.assertEqual(task.due, date(3, 4, 5))
+
+    def test_due_one_undue_task(self):
+        task = Task(sub_tasks=[
+            SubTask(due=date(9, 10, 11)),
+            SubTask(due=date(3, 4, 5)),
+            SubTask(due=date(6, 7, 8)),
+            SubTask(due=None)])
+        self.assertEqual(task.due, date(3, 4, 5))

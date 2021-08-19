@@ -35,7 +35,10 @@ class Task:
 
     @property
     def due(self) -> Optional[date]:
-        pass
+        try:
+            return min([sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None])
+        except ValueError:
+            return None
 
     @property
     def completed(self) -> Optional[date]:
