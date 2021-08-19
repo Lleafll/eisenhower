@@ -64,6 +64,12 @@ class TaskManager:
         new_task = replace(sub_task, due=None)
         _replace_sub_task(tasks, sub_task, new_task)
 
+    def remove_snooze(self, task: Task) -> None:
+        tasks = self._history.advance_history()
+        new_sub_tasks = list(replace(sub_task, snooze=None) for sub_task in task.sub_tasks)
+        new_task = replace(task, sub_tasks=new_sub_tasks)
+        _replace(tasks, task, new_task)
+
     def remove_snooze_sub_task(self, sub_task: SubTask) -> None:
         tasks = self._history.advance_history()
         new_task = replace(sub_task, snooze=None)
@@ -142,12 +148,12 @@ def convert_no_version_to_2(old_task: Any) -> Task:
     completed = old_task.completed if isinstance(old_task.completed, date) else None
     sub_tasks.insert(
         0,
-        SubTask(old_task.name, old_task.due, old_task.snooze, completed))
+        SubTask(old_task.name, old_task.due, old_task.snooze))
     return Task(
         old_task.name,
         old_task.importance,
-        old_task.resources,
-        sub_tasks)
+        sub_tasks,
+        completed)
 
 
 def load_task_manager(import_path: Path) -> TaskManager:
