@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any, List
 from datetime import date
 from dataclasses import replace
 from pickle import load, dump
@@ -122,6 +122,19 @@ def _replace_sub_task(
         pass
 
 
+def convert_no_version_to_2(old_task: Any) -> Task:
+    sub_tasks: List[SubTask] = getattr(old_task, "sub_tasks", [])
+    completed = old_task.completed if isinstance(old_task.completed, date) else None
+    sub_tasks.insert(
+        0,
+        SubTask(old_task.name, old_task.due, old_task.snooze, completed))
+    return Task(
+        old_task.name,
+        old_task.importance,
+        old_task.resources,
+        sub_tasks)
+
+
 def load_task_manager(import_path: Path) -> TaskManager:
     try:
         with open(import_path, "rb") as file:
@@ -129,14 +142,12 @@ def load_task_manager(import_path: Path) -> TaskManager:
     except FileNotFoundError:
         tasks = []
     for i, task in enumerate(tasks):
-        if not hasattr(task, "sub_tasks"):
-            tasks[i] = Task(
-                task.name,
-                task.importance,
-                task.due,
-                task.snooze,
-                task.completed,
-                task.resources)
+        version = getattr(task, "version", None)
+        if version is None:
+            tasks[i] = convert_no_version_to_2(task)
+        for j, sub_task in enumerate(tasks[i].sub_tasks):
+            if sub_task.completed is False:
+                tasks[i].sub_tasks[j] = replace(sub_task, completed = None)
     return TaskManager(tasks)
 
 
