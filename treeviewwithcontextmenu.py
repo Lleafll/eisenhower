@@ -152,6 +152,7 @@ def _build_row(
             item = QtGui.QStandardItem(task.name)
         elif column == Column.Due:
             item = _build_due_date_item(task.due)
+            item.setEditable(False)
         elif column == Column.Snoozed:
             item = _build_date_item(
                 task.snooze if has_snoozed_date(task) else None)

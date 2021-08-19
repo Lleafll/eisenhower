@@ -114,7 +114,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     def show_snoozed_tasks(self, should_show: bool = True) -> None:
         self._lower_list.setVisible(should_show)
 
-    def _item_changed(
+    def item_changed(
             self,
             task_list: TreeViewWithContextMenu,
             item: QtGui.QStandardItem) -> None:
@@ -169,7 +169,7 @@ def _build_model_and_connect(
         header.setSectionResizeMode(i, QtWidgets.QHeaderView.ResizeMode.Fixed)
         header.resizeSection(i, 80)
     header.setStretchLastSection(False)
-    model.itemChanged.connect(lambda item: view._item_changed(task_list, item))
+    model.itemChanged.connect(lambda item: view.item_changed(task_list, item))
     task_list.setItemDelegateForColumn(0, ItemWordWrap(task_list))
     for i in (1, 2):
         task_list.setItemDelegateForColumn(i, CalendarDelegate(task_list))
