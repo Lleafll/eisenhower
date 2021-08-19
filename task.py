@@ -1,8 +1,8 @@
 from dataclasses import dataclass, field
-from pathlib import Path
 from datetime import date
-from typing import Optional, Iterable, Tuple, List, Union
 from enum import Enum, auto
+from pathlib import Path
+from typing import Optional, Iterable, Tuple, List, Union
 
 
 class Importance(Enum):
@@ -29,7 +29,7 @@ class Task:
     @property
     def snooze(self) -> Optional[date]:
         try:
-            return min(map(lambda sub_task: sub_task.snooze, self.sub_tasks))
+            return min([sub_task.snooze for sub_task in self.sub_tasks if sub_task.snooze is not None])
         except ValueError:
             return None
 
@@ -39,7 +39,13 @@ class Task:
 
     @property
     def completed(self) -> Optional[date]:
-        pass
+        if any(sub_task.completed is None for sub_task in self.sub_tasks):
+            return None
+        else:
+            try:
+                return max([sub_task.completed for sub_task in self.sub_tasks if sub_task.completed is not None])
+            except ValueError:
+                return None
 
 
 def has_due_date(task: Union[Task, SubTask]) -> bool:
@@ -62,7 +68,7 @@ def is_important(task: Task) -> bool:
 
 def sort_tasks_by_relevance(
         tasks: Iterable[Task]) -> \
-                Tuple[List[Task], List[Task], List[Task], List[Task]]:
+        Tuple[List[Task], List[Task], List[Task], List[Task]]:
     completed_tasks: List[Task] = []
     snoozed_tasks: List[Task] = []
     due_tasks: List[Task] = []
