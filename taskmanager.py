@@ -145,9 +145,6 @@ def load_task_manager(import_path: Path) -> TaskManager:
         version = getattr(task, "version", None)
         if version is None:
             tasks[i] = convert_no_version_to_2(task)
-        for j, sub_task in enumerate(tasks[i].sub_tasks):
-            if sub_task.completed is False:
-                tasks[i].sub_tasks[j] = replace(sub_task, completed = None)
     return TaskManager(tasks)
 
 

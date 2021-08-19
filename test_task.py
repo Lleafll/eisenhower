@@ -1,7 +1,7 @@
 from datetime import date
 from unittest import TestCase
 
-from task import Task, SubTask
+from task import Task, SubTask, has_due_date
 
 
 class TestTask(TestCase):
@@ -62,3 +62,7 @@ class TestTask(TestCase):
             SubTask(due=date(6, 7, 8)),
             SubTask(due=None)])
         self.assertEqual(task.due, date(3, 4, 5))
+
+    def test_has_due_date_sub_task(self):
+        sub_task = SubTask()
+        self.assertFalse(has_due_date(sub_task))

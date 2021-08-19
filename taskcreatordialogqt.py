@@ -1,11 +1,11 @@
 from typing import Optional
 from datetime import date
 from PySide2 import QtWidgets
-from task import Task, Importance, has_snoozed_date
+from task import Task, Importance, has_snoozed_date, SubTask
 from resourceviewqt import ResourceViewQt
 
 
-_default_task = Task("", Importance.Important, date.today())
+_default_task = Task("", Importance.Important)
 
 
 class TaskCreatorDialogQt(QtWidgets.QDialog):
@@ -93,7 +93,11 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         else:
             snooze = self._snoozed_date_widget.selectedDate()
         resources = self._resource_list.resources()
-        return Task(name, importance, due, snooze, resources=resources)
+        return Task(
+            name,
+            importance,
+            resources,
+            [SubTask(name, due, snooze)])
 
     @staticmethod
     def askNewTask(

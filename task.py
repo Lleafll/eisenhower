@@ -15,7 +15,7 @@ class SubTask:
     name: str = "SubTask"
     due: Optional[date] = None
     snooze: Optional[date] = None
-    completed: Optional[date] = False
+    completed: Optional[date] = None
 
 
 @dataclass(frozen=True)
@@ -52,8 +52,10 @@ class Task:
 
 
 def has_due_date(task: Union[Task, SubTask]) -> bool:
-    return (task.due is not None) or (any(i is not None for i in task.sub_tasks))
-
+    if isinstance(task, Task):
+        return (task.due is not None) or (any(i is not None for i in task.sub_tasks))
+    else:
+        return task.due is not None
 
 def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
     if task.snooze is None:
