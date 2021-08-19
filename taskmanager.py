@@ -122,25 +122,23 @@ def _complete(tasks: Tasks, old_task: Task, is_complete: bool) -> None:
 
 
 def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
-    try:
-        index = tasks.index(old_task)
-        tasks[index] = new_task
-    except ValueError:
-        pass
+    index = tasks.index(old_task)
+    tasks[index] = new_task
 
 
 def _replace_sub_task(
         tasks: Tasks,
         old_sub_task: SubTask,
         new_sub_task: SubTask) -> None:
-    try:
-        for task in tasks:
-            sub_tasks = task.sub_tasks
-            if old_sub_task in sub_tasks:
-                index = sub_tasks.index(old_sub_task)
-                sub_tasks[index] = new_sub_task
-    except ValueError:
-        pass
+    for task in tasks:
+        sub_tasks = task.sub_tasks
+        if old_sub_task in sub_tasks:
+            index = sub_tasks.index(old_sub_task)
+            mutable_sub_tasks = list(sub_tasks)
+            mutable_sub_tasks[index] = new_sub_task
+            new_task = replace(task, sub_tasks=tuple(mutable_sub_tasks))
+            _replace(tasks, task, new_task)
+            return
 
 
 def convert_no_version_to_2(old_task: Any) -> Task:

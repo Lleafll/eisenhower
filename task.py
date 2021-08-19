@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 from datetime import date
 from enum import Enum, auto
-from pathlib import Path
 from typing import Optional, Iterable, Tuple, List, Union
 
 
@@ -21,7 +20,7 @@ class SubTask:
 class Task:
     name: str = "Task"
     importance: Importance = Importance.Unimportant
-    sub_tasks: List[SubTask] = field(default_factory=list)
+    sub_tasks: Tuple[SubTask] = field(default_factory=tuple)
     completed: Optional[date] = None
     version: int = 2
 
