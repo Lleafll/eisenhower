@@ -47,7 +47,8 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setEditTriggers(
                 QtWidgets.QAbstractItemView.EditKeyPressed |
                 QtWidgets.QAbstractItemView.AnyKeyPressed |
-                QtWidgets.QAbstractItemView.SelectedClicked)
+                QtWidgets.QAbstractItemView.SelectedClicked |
+                QtWidgets.QAbstractItemView.DoubleClicked)
         self.setAlternatingRowColors(True)
         palette = self.palette()
         base_color = color.lighter(115)
@@ -71,9 +72,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         index = self.indexAt(point)
         context_menu = QtWidgets.QMenu()
         if index.isValid():
-            rename_action = QtWidgets.QAction("Change")
-            rename_action.triggered.connect(lambda: self.edit(index))
-            context_menu.addAction(rename_action)
             task: Union[Task, SubTask] = index.data(TASK_ROLE)
             if isinstance(task, Task):
                 add_sub_task = QtWidgets.QAction("Add Subtask")
