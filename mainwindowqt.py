@@ -84,6 +84,7 @@ class MainWindowQt(QtWidgets.QWidget):
             task_layout.addWidget(task_list)
             task_list.complete_task_requested.connect(self._complete_task)
             task_list.delete_task_requested.connect(self._delete_task)
+            task_list.delete_sub_task_requested.connect(self._delete_sub_task)
             task_list.rename_task_requested.connect(self._rename_task)
             task_list.rename_sub_task_requested.connect(self._rename_sub_task)
             task_list.schedule_sub_task_requested.connect(self._set_sub_task_due)
@@ -209,6 +210,12 @@ class MainWindowQt(QtWidgets.QWidget):
         if self._task_manager is None:
             return
         self._task_manager.instance.delete(task)
+        self._update_and_save()
+
+    def _delete_sub_task(self, task: SubTask) -> None:
+        if self._task_manager is None:
+            return
+        self._task_manager.instance.delete_sub_task(task)
         self._update_and_save()
 
     def _rename_task(self, task: Task, name: str) -> None:

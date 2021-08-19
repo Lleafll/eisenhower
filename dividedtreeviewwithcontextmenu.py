@@ -49,6 +49,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     add_sub_task_requested = QtCore.Signal(Task)
     complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
+    delete_sub_task_requested = QtCore.Signal(SubTask)
     rename_task_requested = QtCore.Signal(Task, str)
     rename_sub_task_requested = QtCore.Signal(SubTask, str)
     schedule_sub_task_requested = QtCore.Signal(SubTask, date)
@@ -91,6 +92,8 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list.complete_task_requested.connect(
                 self.complete_task_requested)
             task_list.delete_task_requested.connect(self.delete_task_requested)
+            task_list.delete_sub_task_requested.connect(
+                self.delete_sub_task_requested)
             task_list.set_important_requested.connect(
                 self.set_important_requested)
             task_list.set_unimportant_requested.connect(

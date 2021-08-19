@@ -26,6 +26,10 @@ class TaskManager:
         tasks = self._history.advance_history()
         _delete(tasks, task)
 
+    def delete_sub_task(self, task: SubTask) -> None:
+        tasks = self._history.advance_history()
+        _delete_sub_task(tasks, task)
+
     def replace(self, old_task: Task, new_task: Task) -> None:
         tasks = self._history.advance_history()
         _delete(tasks, old_task)
@@ -88,6 +92,17 @@ def _delete(tasks: Tasks, task: Task) -> None:
         tasks.remove(task)
     except ValueError:
         pass
+
+
+def _delete_sub_task(tasks: Tasks, sub_task: SubTask) -> None:
+    for task in tasks:
+        sub_tasks = task.sub_tasks
+        if sub_task in sub_tasks:
+            try:
+                sub_tasks.remove(sub_task)
+            except ValueError:
+                pass
+            return
 
 
 def _complete(tasks: Tasks, old_task: Task, is_complete: bool) -> None:
