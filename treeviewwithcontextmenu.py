@@ -189,7 +189,7 @@ def _build_sub_task_row(
             item = _build_date_item(
                 task.snooze if has_snoozed_date(task) else None)
         elif column == Column.Archived:
-            item = _build_date_item(task.completed)
+            item = _build_date_item(None)
             item.setEditable(False)
         else:
             raise RuntimeError("Unhandled column")
