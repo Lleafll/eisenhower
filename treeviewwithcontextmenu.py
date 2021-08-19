@@ -93,18 +93,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                     set_important_task.triggered.connect(
                         lambda: self.set_important_requested.emit(task))
                     context_menu.addAction(set_important_task)
-                if Column.Due in self._displayed_columns:
-                    if has_due_date(task):
-                        remove_due_action = QtWidgets.QAction("Remove Due")
-                        remove_due_action.triggered.connect(
-                            lambda: self.remove_due_requested.emit(task))
-                        context_menu.addAction(remove_due_action)
-                if has_snoozed_date(
-                        task) and Column.Snoozed in self._displayed_columns:
-                    remove_snooze_action = QtWidgets.QAction("Remove Snooze")
-                    remove_snooze_action.triggered.connect(
-                        lambda: self.remove_snooze_requested.emit(task))
-                    context_menu.addAction(remove_snooze_action)
                 if is_completed(task):
                     if Column.Archived in self._displayed_columns:
                         unarchive_action = QtWidgets.QAction("Unarchive")

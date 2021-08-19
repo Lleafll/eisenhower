@@ -55,6 +55,16 @@ class TaskManager:
         new_task = replace(sub_task, name=new_name)
         _replace_sub_task(tasks, sub_task, new_task)
 
+    def remove_due_sub_task(self, sub_task: SubTask):
+        tasks = self._history.advance_history()
+        new_task = replace(sub_task, due=None)
+        _replace_sub_task(tasks, sub_task, new_task)
+
+    def remove_snooze_sub_task(self, sub_task: SubTask) -> None:
+        tasks = self._history.advance_history()
+        new_task = replace(sub_task, snooze=None)
+        _replace_sub_task(tasks, sub_task, new_task)
+
     def set_importance(self, task: Task, importance: Importance) -> None:
         tasks = self._history.advance_history()
         new_task = replace(task, importance=importance)
