@@ -147,7 +147,12 @@ def _build_date_item(date_: Optional[date]) -> QtGui.QStandardItem:
 
 
 def _build_due_date_item(date_: Optional[date]) -> QtGui.QStandardItem:
-    return _build_date_item(date_)  # type: ignore
+    item = _build_date_item(date_)
+    if date_ is not None and date_ <= date.today():
+        font = item.font()
+        font.setBold(True)
+        item.setFont(font)
+    return item
 
 
 def _build_row(
