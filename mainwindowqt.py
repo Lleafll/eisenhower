@@ -101,7 +101,6 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.set_unimportant_requested.connect(
                 lambda task: self._set_importance(
                     task, Importance.Unimportant))
-            task_list.task_view_requested.connect(self._open_task)
         self._undo_button.clicked.connect(self._undo)
         self._redo_button.clicked.connect(self._redo)
         self._add_task_button.clicked.connect(self._add_task)
@@ -189,15 +188,6 @@ class MainWindowQt(QtWidgets.QWidget):
         if self._task_manager is None:
             return
         self._task_manager.instance.add_sub_task(task)
-        self._update_and_save()
-
-    def _open_task(self, task: Task) -> None:
-        if self._task_manager is None:
-            return
-        new_task = TaskCreatorDialogQt.askNewTask(self, task)
-        if new_task is None:
-            return
-        self._task_manager.instance.replace(task, new_task)
         self._update_and_save()
 
     def _complete_task(self, task: Task) -> None:

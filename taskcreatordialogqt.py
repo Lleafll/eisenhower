@@ -2,7 +2,6 @@ from typing import Optional
 from datetime import date
 from PySide2 import QtWidgets
 from task import Task, Importance, has_snoozed_date, SubTask
-from resourceviewqt import ResourceViewQt
 
 
 _default_task = Task("", Importance.Important)
@@ -45,7 +44,6 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         snooze_buttons_layout.addWidget(self._no_snooze_button)
         self._snoozed_date_widget = QtWidgets.QCalendarWidget(self)
         self._snoozed_date_widget.hide()
-        self._resource_list = ResourceViewQt(task, self)
         buttons = QtWidgets.QDialogButtonBox(
             QtWidgets.QDialogButtonBox.Ok | QtWidgets.QDialogButtonBox.Cancel,
             self)
@@ -57,7 +55,6 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         layout.addRow("", self._due_date_widget)
         layout.addRow("Snooze", snooze_buttons_box)
         layout.addRow("", self._snoozed_date_widget)
-        layout.addRow("Resources", self._resource_list)
         layout.addRow(buttons)
         self._due_date_button.toggled.connect(self._due_date_widget.setVisible)
         self._is_snoozed_button.toggled.connect(
@@ -92,11 +89,9 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
             snooze: Optional[date] = None
         else:
             snooze = self._snoozed_date_widget.selectedDate()
-        resources = self._resource_list.resources()
         return Task(
             name,
             importance,
-            resources,
             [SubTask(name, due, snooze)])
 
     @staticmethod

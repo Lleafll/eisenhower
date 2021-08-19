@@ -21,7 +21,6 @@ class SubTask:
 class Task:
     name: str = "Task"
     importance: Importance = Importance.Unimportant
-    resources: List[Path] = field(default_factory=list)
     sub_tasks: List[SubTask] = field(default_factory=list)
     completed: Optional[date] = None
     version: int = 2
