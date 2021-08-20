@@ -22,7 +22,7 @@ class Task:
     importance: Importance = Importance.Unimportant
     sub_tasks: Tuple[SubTask] = field(default_factory=tuple)
     completed: Optional[date] = None
-    version: int = 2
+    version: int = 3
 
     @property
     def snooze(self) -> Optional[date]:
