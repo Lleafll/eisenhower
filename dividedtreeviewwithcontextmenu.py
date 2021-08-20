@@ -135,12 +135,9 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         if column == Column.Name:
             new_name = item.data(QtCore.Qt.DisplayRole)
             self.rename_task_requested.emit(task, new_name)
-        elif column == Column.Due:
-            due = item.data(QtCore.Qt.DisplayRole)
-            self.schedule_task_requested.emit(task, due)
         elif column == Column.Snoozed:
             snoozed = item.data(QtCore.Qt.DisplayRole)
-            self.snooze_task_requested.emit(task, snoozed)
+            self.snooze_task_requested.emit(task, _qdate_to_date(snoozed))
 
     def _sub_task_item_changed(
             self,
@@ -152,10 +149,10 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             self.rename_sub_task_requested.emit(sub_task, new_name)
         elif column == Column.Due:
             due = item.data(QtCore.Qt.DisplayRole)
-            self.schedule_sub_task_requested.emit(sub_task, due)
+            self.schedule_sub_task_requested.emit(sub_task, _qdate_to_date(due))
         elif column == Column.Snoozed:
             snoozed = item.data(QtCore.Qt.DisplayRole)
-            self.snooze_sub_task_requested.emit(sub_task, snoozed)
+            self.snooze_sub_task_requested.emit(sub_task, _qdate_to_date(snoozed))
 
 
 def _build_model_and_connect(
@@ -175,3 +172,7 @@ def _build_model_and_connect(
     task_list.setItemDelegateForColumn(0, ItemWordWrap(task_list))
     for i in (1, 2):
         task_list.setItemDelegateForColumn(i, CalendarDelegate(task_list))
+
+
+def _qdate_to_date(qdate: QtCore.QDate) -> date:
+    return date(qdate.year(), qdate.month(), qdate.day())
