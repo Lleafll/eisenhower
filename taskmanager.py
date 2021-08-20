@@ -166,6 +166,8 @@ def _convert_version_2_to_latest(old_task: Any) -> Task:
 def _fix_qdate(date_: Optional[Any]) -> Optional[date]:
     if date_ is None:
         return None
+    if isinstance(date_, date):
+        return date_
     return date(date_.year(), date_.month(), date_.day())
 
 
