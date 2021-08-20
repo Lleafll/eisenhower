@@ -150,7 +150,7 @@ def convert_no_version_to_2(old_task: Any) -> Task:
     return Task(
         old_task.name,
         old_task.importance,
-        sub_tasks,
+        tuple(sub_tasks),
         completed)
 
 
