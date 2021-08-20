@@ -22,4 +22,4 @@ if __name__ == "__main__":
     if path is not None:
         main_window.load_from_file(path)
     main_window.show()
-    app.exec_()
+    app.exec()
