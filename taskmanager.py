@@ -20,8 +20,11 @@ class TaskManager:
         tasks.append(task)
 
     def add_sub_task(self, task: Task) -> None:
-        self._history.advance_history()
-        task.sub_tasks.append(SubTask("New Subtask"))
+        tasks = self._history.advance_history()
+        sub_tasks = list(task.sub_tasks)
+        sub_tasks.append(SubTask("New SubTask"))
+        new_task = replace(task, sub_tasks=tuple(sub_tasks))
+        _replace(tasks, task, new_task)
 
     def delete(self, task: Task) -> None:
         tasks = self._history.advance_history()
