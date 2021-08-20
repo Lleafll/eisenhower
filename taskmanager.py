@@ -71,7 +71,7 @@ class TaskManager:
     def remove_snooze(self, task: Task) -> None:
         tasks = self._history.advance_history()
         new_sub_tasks = list(replace(sub_task, snooze=None) for sub_task in task.sub_tasks)
-        new_task = replace(task, sub_tasks=new_sub_tasks)
+        new_task = replace(task, sub_tasks=tuple(new_sub_tasks))
         _replace(tasks, task, new_task)
 
     def remove_snooze_sub_task(self, sub_task: SubTask) -> None:
