@@ -109,7 +109,10 @@ def _delete_sub_task(tasks: Tasks, sub_task: SubTask) -> None:
         sub_tasks = task.sub_tasks
         if sub_task in sub_tasks:
             try:
-                sub_tasks.remove(sub_task)
+                mutable_subtasks = list(sub_tasks)
+                mutable_subtasks.remove(sub_task)
+                new_task = replace(task, sub_tasks=tuple(mutable_subtasks))
+                _replace(tasks, task, new_task)
             except ValueError:
                 pass
             return

@@ -12,3 +12,11 @@ class TestTaskManager(TestCase):
         self.assertEqual(
             task_manager.tasks(),
             [Task(sub_tasks=(SubTask("New SubTask"),))])
+
+    def test_delete_sub_task(self):
+        sub_task = SubTask()
+        task_manager = TaskManager([Task(sub_tasks=(sub_task,))])
+        task_manager.delete_sub_task(sub_task)
+        self.assertEqual(
+            task_manager.tasks(),
+            [Task()])
