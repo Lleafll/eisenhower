@@ -1,7 +1,7 @@
 from typing import Optional, Iterable, Sequence, Union
 from datetime import date
 from enum import Enum, auto
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 from task import (
     Task,
     has_due_date,

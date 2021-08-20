@@ -3,7 +3,7 @@ from pathlib import Path
 from dataclasses import dataclass
 from datetime import date
 from itertools import filterfalse
-from PySide2 import QtWidgets, QtGui, QtCore
+from PySide6 import QtWidgets, QtGui, QtCore
 from task import (
     Task,
     is_completed,
@@ -43,7 +43,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self.setPalette(palette)
         self._task_manager: Optional[TaskManagerWrapper] = None
         layout = QtWidgets.QHBoxLayout(self)
-        layout.setMargin(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
         self._undo_button = QtWidgets.QPushButton("Undo")
         self._redo_button = QtWidgets.QPushButton("Redo")
@@ -73,7 +73,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._drop_list = SeparatedTreeViewWithContextMenu(
             "Drop", QtGui.QColor(128, 222, 234), self)
         task_layout = QtWidgets.QHBoxLayout()
-        task_layout.setMargin(0)
+        task_layout.setContentsMargins(0, 0, 0, 0)
         task_layout.setSpacing(5)
         layout.addLayout(task_layout)
         for task_list in (

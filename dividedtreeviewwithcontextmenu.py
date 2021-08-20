@@ -1,6 +1,6 @@
 from typing import Sequence
 from datetime import date
-from PySide2 import QtWidgets, QtCore, QtGui
+from PySide6 import QtWidgets, QtCore, QtGui
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
 from task import Task, sort_tasks_by_relevance, SubTask
@@ -81,7 +81,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         self._lower_list = TreeViewWithContextMenu(
             (Column.Name, Column.Due, Column.Snoozed), color, self)
         layout = QtWidgets.QVBoxLayout(self)
-        layout.setMargin(0)
+        layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(1)
         layout.addWidget(header_label)
         for task_list in (self._upper_list, self._lower_list):
