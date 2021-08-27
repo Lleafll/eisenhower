@@ -148,46 +148,6 @@ def _replace_sub_task(
             return
 
 
-def _convert_no_version_to_latest(old_task: Any) -> Task:
-    sub_tasks: List[SubTask] = getattr(old_task, "sub_tasks", [])
-    completed = old_task.completed if isinstance(old_task.completed, date) else None
-    sub_tasks.insert(
-        0,
-        SubTask(old_task.name, old_task.due, old_task.snooze))
-    return Task(
-        old_task.name,
-        old_task.importance,
-        tuple(sub_tasks),
-        completed)
-
-
-def _convert_version_2_to_latest(old_task: Any) -> Task:
-    return Task(
-        old_task.name,
-        old_task.importance,
-        old_task.sub_tasks,
-        old_task.completed)
-
-
-def _fix_qdate(date_: Optional[Any]) -> Optional[date]:
-    if date_ is None:
-        return None
-    if isinstance(date_, date):
-        return date_
-    return date(date_.year(), date_.month(), date_.day())
-
-
-def _fix_dates(task: Task) -> Task:
-    task = replace(task, completed=_fix_qdate(task.completed))
-    sub_tasks: List[SubTask] = list(task.sub_tasks)
-    for i, sub_task in enumerate(sub_tasks):
-        sub_tasks[i] = replace(
-            sub_task,
-            due=_fix_qdate(sub_task.due),
-            snooze=_fix_qdate(sub_task.snooze))
-    return replace(task, sub_tasks=tuple(sub_tasks))
-
-
 def _sanitize_task(task: Task) -> Task:
     return Task(
         task.name,
@@ -202,14 +162,6 @@ def load_task_manager(import_path: Path) -> TaskManager:
             tasks: Tasks = load(file)
     except FileNotFoundError:
         tasks = []
-    for i, task in enumerate(tasks):
-        version = getattr(task, "version", None)
-        if version is None:
-            tasks[i] = _convert_no_version_to_latest(task)
-        elif version == 2:
-            tasks[i] = _convert_version_2_to_latest(task)
-    for i, task in enumerate(tasks):
-        tasks[i] = _fix_dates(task)
     for i, task in enumerate(tasks):
         tasks[i] = _sanitize_task(task)
     return TaskManager(tasks)
