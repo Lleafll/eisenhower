@@ -83,3 +83,9 @@ class TestTask(TestCase):
             SubTask(due=date(1, 2, 3), snooze=date.today() + timedelta(days=2)),
             SubTask(due=None, snooze=None)))
         self.assertFalse(has_snoozed_date(task))
+
+    def test_is_not_snoozed_when_task_has_snoozed_subtask_in_the_past_without_due_date(self):
+        task = Task(sub_tasks=(
+            SubTask(due=date(1, 2, 3), snooze=date.today() + timedelta(days=2)),
+            SubTask(due=None, snooze=date(4, 5, 6))))
+        self.assertFalse(has_snoozed_date(task))
