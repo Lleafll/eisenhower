@@ -34,7 +34,7 @@ class Task:
     @property
     def due(self) -> Optional[date]:
         try:
-            return min([sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None])
+            return min([sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None and sub_task.snooze is None])
         except ValueError:
             return None
 

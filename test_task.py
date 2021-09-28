@@ -59,3 +59,10 @@ class TestTask(TestCase):
     def test_has_due_date_task_with_undue_sub_task(self):
         task = Task(sub_tasks=(SubTask(),))
         self.assertFalse(has_due_date(task))
+
+    def test_uses_due_date_of_unsnoozed_subtask(self):
+        task = Task(sub_tasks=(
+            SubTask(due=date(1, 2, 3), snooze=date.today() + timedelta(days=2)),
+            SubTask(due=date(4, 5, 6))))
+        self.assertEqual(task.due, date(4, 5, 6))
+
