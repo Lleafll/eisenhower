@@ -14,8 +14,8 @@ class TestTask(TestCase):
         self.assertIsNone(task.snooze)
 
     def test_snooze_one_snoozed_sub_task(self):
-        task = Task(sub_tasks=(SubTask(snooze=date(1, 2, 3)),))
-        self.assertEqual(task.snooze, date(1, 2, 3))
+        task = Task(sub_tasks=(SubTask(snooze=date.today() + timedelta(days=2)), ))
+        self.assertEqual(task.snooze, date.today() + timedelta(days=2))
 
     def test_snooze_several_snoozed_sub_task(self):
         task = Task(sub_tasks=(
@@ -23,7 +23,7 @@ class TestTask(TestCase):
             SubTask(snooze=date(3, 4, 5)),
             SubTask(snooze=date(6, 7, 8)),
             SubTask(snooze=None)))
-        self.assertEqual(task.snooze, date(3, 4, 5))
+        self.assertEqual(task.snooze, None)
 
     def test_due_empty_task(self):
         task = Task()
@@ -72,3 +72,14 @@ class TestTask(TestCase):
             SubTask(due=date(4, 5, 6), snooze=date.today() + timedelta(days=3))))
         self.assertEqual(task.due, date(1, 2, 3))
 
+    def test_snooze_is_None_when_task_has_unsnoozed_subtask_without_due_date(self):
+        task = Task(sub_tasks=(
+            SubTask(due=date(1, 2, 3), snooze=date.today() + timedelta(days=2)),
+            SubTask(due=None, snooze=None)))
+        self.assertIsNone(task.snooze)
+
+    def test_is_not_snoozed_when_task_has_unsnoozed_subtask_without_due_date(self):
+        task = Task(sub_tasks=(
+            SubTask(due=date(1, 2, 3), snooze=date.today() + timedelta(days=2)),
+            SubTask(due=None, snooze=None)))
+        self.assertFalse(has_snoozed_date(task))

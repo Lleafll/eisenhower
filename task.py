@@ -26,7 +26,10 @@ class Task:
     @property
     def snooze(self) -> Optional[date]:
         try:
-            return min([sub_task.snooze for sub_task in self.sub_tasks if sub_task.snooze is not None])
+            if any(sub_task.snooze is None for sub_task in self.sub_tasks):
+                return None
+            else:
+                return min([sub_task.snooze for sub_task in self.sub_tasks if has_snoozed_date(sub_task)])
         except ValueError:
             return None
 
