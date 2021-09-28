@@ -66,3 +66,9 @@ class TestTask(TestCase):
             SubTask(due=date(4, 5, 6))))
         self.assertEqual(task.due, date(4, 5, 6))
 
+    def test_uses_due_date_of_snoozed_subtasks_when_no_unsnoozed_subtask(self):
+        task = Task(sub_tasks=(
+            SubTask(due=date(1, 2, 3), snooze=date.today() + timedelta(days=2)),
+            SubTask(due=date(4, 5, 6), snooze=date.today() + timedelta(days=3))))
+        self.assertEqual(task.due, date(1, 2, 3))
+

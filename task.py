@@ -34,7 +34,11 @@ class Task:
     @property
     def due(self) -> Optional[date]:
         try:
-            return min([sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None and sub_task.snooze is None])
+            if not all(has_snoozed_date(sub_task) for sub_task in self.sub_tasks):
+                return min(
+                    [sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None and not has_snoozed_date(sub_task)])
+            else:
+                return min([sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None])
         except ValueError:
             return None
 
