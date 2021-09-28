@@ -20,7 +20,7 @@ class SubTask:
 class Task:
     name: str = "Task"
     importance: Importance = Importance.Unimportant
-    sub_tasks: Tuple[SubTask] = field(default_factory=tuple)
+    sub_tasks: Tuple[SubTask, ...] = field(default_factory=tuple)
     completed: Optional[date] = None
     version: int = 3
 
