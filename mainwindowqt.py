@@ -217,7 +217,7 @@ class MainWindowQt(QtWidgets.QWidget):
     def _set_task_due(self, task: SubTask, due: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
-        self._task_manager.instance.schedule_sub_task(task, due)
+        self._task_manager.instance.schedule_task(task, due)
         self._update_and_save()
 
     def _set_sub_task_snooze(self, task: SubTask, snooze: Optional[date] = None) -> None:
