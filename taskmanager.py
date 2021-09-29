@@ -149,7 +149,7 @@ def _replace_sub_task(
 
 
 def sanitize_sub_task(sub_task: SubTask) -> SubTask:
-    if type(sub_task.due) == QtCore.QDate:
+    if sub_task.due is not None and type(sub_task.due) != date:
         due: QtCore.QDate = sub_task.due
         return SubTask(
             sub_task.name,
