@@ -37,6 +37,11 @@ class TaskManager:
         new_task = replace(task, due=due)
         _replace(tasks, task, new_task)
 
+    def snooze(self, task: Task, snooze: Optional[date]) -> None:
+        tasks = self._history.advance_history()
+        new_task = replace(task, snooze=snooze)
+        _replace(tasks, task, new_task)
+
     def rename(self, task: Task, new_name: str) -> None:
         tasks = self._history.advance_history()
         new_task = replace(task, name=new_name)
@@ -104,7 +109,7 @@ def _sanitize_task(task: Task) -> List[Task]:
         return [sanitize_sub_task(
             sub_task, task.importance, task.completed) for sub_task in task.sub_tasks]
     else:
-        return task
+        return [task]
 
 
 def load_task_manager(import_path: Path) -> TaskManager:

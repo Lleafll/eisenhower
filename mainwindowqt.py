@@ -9,7 +9,7 @@ from task import (
     is_completed,
     is_urgent,
     is_important,
-    Importance, SubTask)
+    Importance)
 from taskmanager import (
     TaskManager, load_task_manager, save_task_manager)
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
@@ -86,8 +86,8 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.delete_task_requested.connect(self._delete_task)
             task_list.rename_task_requested.connect(self._rename_task)
             task_list.schedule_task_requested.connect(self._set_task_due)
+            task_list.snooze_task_requested.connect(self._set_task_snooze)
             task_list.add_task_requested.connect(self._add_task)
-            task_list.add_sub_task_requested.connect(self._add_sub_task)
             task_list.remove_snooze_requested.connect(self._remove_snooze)
             task_list.set_important_requested.connect(
                 lambda task: self._set_importance(
@@ -178,12 +178,6 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.add(task)
         self._update_and_save()
 
-    def _add_sub_task(self, task: Task) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.add_sub_task(task)
-        self._update_and_save()
-
     def _complete_task(self, task: Task) -> None:
         if self._task_manager is None:
             return
@@ -196,34 +190,22 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.delete(task)
         self._update_and_save()
 
-    def _delete_sub_task(self, task: SubTask) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.delete_sub_task(task)
-        self._update_and_save()
-
     def _rename_task(self, task: Task, name: str) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.rename(task, name)
         self._update_and_save()
 
-    def _rename_sub_task(self, sub_task: SubTask, name: str) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.rename_sub_task(sub_task, name)
-        self._update_and_save()
-
-    def _set_task_due(self, task: SubTask, due: Optional[date] = None) -> None:
+    def _set_task_due(self, task: Task, due: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.schedule_task(task, due)
         self._update_and_save()
 
-    def _set_sub_task_snooze(self, task: SubTask, snooze: Optional[date] = None) -> None:
+    def _set_task_snooze(self, task: Task, snooze: Optional[date] = None) -> None:
         if self._task_manager is None:
             return
-        self._task_manager.instance.snooze_sub_task(task, snooze)
+        self._task_manager.instance.snooze(task, snooze)
         self._update_and_save()
 
     def _set_importance(self, task: Task, importance: Importance) -> None:
@@ -232,22 +214,10 @@ class MainWindowQt(QtWidgets.QWidget):
         self._task_manager.instance.set_importance(task, importance)
         self._update_and_save()
 
-    def _remove_due_from_sub_task(self, sub_task: SubTask) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.remove_due_sub_task(sub_task)
-        self._update_and_save()
-
     def _remove_snooze(self, task: Task) -> None:
         if self._task_manager is None:
             return
         self._task_manager.instance.remove_snooze(task)
-        self._update_and_save()
-
-    def _remove_snooze_from_sub_task(self, sub_task: SubTask) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.remove_snooze_sub_task(sub_task)
         self._update_and_save()
 
     def _undo(self) -> None:
