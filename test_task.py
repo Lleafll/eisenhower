@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from unittest import TestCase
 
-from task import Task, SubTask, has_due_date, has_snoozed_date
+from task import Task, SubTask, is_urgent, has_snoozed_date
 
 
 class TestTask(TestCase):
@@ -44,21 +44,25 @@ class TestTask(TestCase):
             SubTask(due=None)))
         self.assertEqual(task.due, date(3, 4, 5))
 
-    def test_has_due_date_sub_task(self):
+    def test_is_urgent_sub_task(self):
         sub_task = SubTask()
-        self.assertFalse(has_due_date(sub_task))
+        self.assertFalse(is_urgent(sub_task))
 
-    def test_has_due_date_task(self):
+    def test_is_urgent_task(self):
         task = Task()
-        self.assertFalse(has_due_date(task))
+        self.assertFalse(is_urgent(task))
 
-    def test_has_due_date_task_with_due_sub_task(self):
+    def test_is_urgent_task_with_due_sub_task(self):
         task = Task(sub_tasks=(SubTask(due=date(5, 3, 2)),))
-        self.assertTrue(has_due_date(task))
+        self.assertTrue(is_urgent(task))
 
-    def test_has_due_date_task_with_undue_sub_task(self):
+    def test_is_urgent_task_with_undue_sub_task(self):
         task = Task(sub_tasks=(SubTask(),))
-        self.assertFalse(has_due_date(task))
+        self.assertFalse(is_urgent(task))
+
+    def test_is_urgent_task_in_the_distant_future(self):
+        task = Task(sub_tasks=(SubTask(due=date(9999, 1, 1)),))
+        self.assertFalse(is_urgent(task))
 
     def test_uses_due_date_of_unsnoozed_subtask(self):
         task = Task(sub_tasks=(

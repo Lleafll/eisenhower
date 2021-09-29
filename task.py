@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timedelta
 from enum import Enum, auto
 from typing import Optional, Iterable, Tuple, List, Union
 
@@ -46,8 +46,11 @@ class Task:
             return None
 
 
-def has_due_date(task: Union[Task, SubTask]) -> bool:
-    return task.due is not None
+def is_urgent(task: Union[Task, SubTask]) -> bool:
+    due = task.due
+    if due is None:
+        return False
+    return (due - date.today()) < timedelta(days=14)
 
 
 def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
@@ -76,7 +79,7 @@ def sort_tasks_by_relevance(
             completed_tasks.append(task)
         elif has_snoozed_date(task):
             snoozed_tasks.append(task)
-        elif has_due_date(task):
+        elif is_urgent(task):
             due_tasks.append(task)
         else:
             normal_tasks.append(task)

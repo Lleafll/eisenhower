@@ -4,7 +4,7 @@ from enum import Enum, auto
 from PySide6 import QtWidgets, QtCore, QtGui
 from task import (
     Task,
-    has_due_date,
+    is_urgent,
     has_snoozed_date,
     is_completed,
     Importance, SubTask)
@@ -112,7 +112,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
                 context_menu.addAction(delete_action)
             else:
                 if Column.Due in self._displayed_columns:
-                    if has_due_date(task):
+                    if is_urgent(task):
                         remove_due_action = QtGui.QAction("Remove Due")
                         remove_due_action.triggered.connect(
                             lambda: self.remove_due_from_sub_task_requested.emit(task))

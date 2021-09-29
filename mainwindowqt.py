@@ -7,7 +7,7 @@ from PySide6 import QtWidgets, QtGui, QtCore
 from task import (
     Task,
     is_completed,
-    has_due_date,
+    is_urgent,
     is_important,
     Importance, SubTask)
 from taskmanager import (
@@ -288,16 +288,16 @@ class MainWindowQt(QtWidgets.QWidget):
 
 
 def _is_do_task(task: Task) -> bool:
-    return is_important(task) and has_due_date(task)
+    return is_important(task) and is_urgent(task)
 
 
 def _is_decide_task(task: Task) -> bool:
-    return is_important(task) and (not has_due_date(task))
+    return is_important(task) and (not is_urgent(task))
 
 
 def _is_delegate_task(task: Task) -> bool:
-    return (not is_important(task)) and has_due_date(task)
+    return (not is_important(task)) and is_urgent(task)
 
 
 def _is_drop_task(task: Task) -> bool:
-    return (not is_important(task)) and (not has_due_date(task))
+    return (not is_important(task)) and (not is_urgent(task))
