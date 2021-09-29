@@ -3,7 +3,7 @@ from datetime import date
 from PySide6 import QtWidgets, QtCore, QtGui
 from treeviewwithcontextmenu import (
         TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
-from task import Task, sort_tasks_by_relevance, SubTask
+from task import Task, sort_tasks_by_relevance
 
 
 class CalendarDelegate(QtWidgets.QStyledItemDelegate):
@@ -49,15 +49,11 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
     add_sub_task_requested = QtCore.Signal(Task)
     complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
-    delete_sub_task_requested = QtCore.Signal(SubTask)
     rename_task_requested = QtCore.Signal(Task, str)
-    rename_sub_task_requested = QtCore.Signal(SubTask, str)
-    schedule_sub_task_requested = QtCore.Signal(SubTask, date)
+    schedule_task_requested = QtCore.Signal(Task, date)
     snooze_task_requested = QtCore.Signal(Task, date)
-    snooze_sub_task_requested = QtCore.Signal(SubTask, date)
-    remove_due_from_sub_task_requested = QtCore.Signal(SubTask)
+    remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
-    remove_snooze_from_sub_task_requested = QtCore.Signal(SubTask)
     set_important_requested = QtCore.Signal(Task)
     set_unimportant_requested = QtCore.Signal(Task)
 
@@ -92,17 +88,13 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             task_list.complete_task_requested.connect(
                 self.complete_task_requested)
             task_list.delete_task_requested.connect(self.delete_task_requested)
-            task_list.delete_sub_task_requested.connect(
-                self.delete_sub_task_requested)
             task_list.set_important_requested.connect(
                 self.set_important_requested)
             task_list.set_unimportant_requested.connect(
                 self.set_unimportant_requested)
             task_list.remove_snooze_requested.connect(self.remove_snooze_requested)
-            task_list.remove_snooze_from_sub_task_requested.connect(
-                self.remove_snooze_from_sub_task_requested)
-            task_list.remove_due_from_sub_task_requested.connect(
-                self.remove_due_from_sub_task_requested)
+            task_list.remove_due_requested.connect(
+                self.remove_due_requested)
         self._upper_list.sortByColumn(1, QtCore.Qt.SortOrder.AscendingOrder)
         self._lower_list.sortByColumn(2, QtCore.Qt.SortOrder.AscendingOrder)
 
@@ -122,10 +114,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
             item: QtGui.QStandardItem) -> None:
         task = item.data(TASK_ROLE)
         column = task_list.columns()[item.column()]
-        if isinstance(task, Task):
-            self._task_item_changed(item, task, column)
-        else:
-            self._sub_task_item_changed(item, task, column)
+        self._task_item_changed(item, task, column)
 
     def _task_item_changed(
             self,
@@ -135,24 +124,12 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         if column == Column.Name:
             new_name = item.data(QtCore.Qt.DisplayRole)
             self.rename_task_requested.emit(task, new_name)
+        elif column == Column.Due:
+            due = item.data(QtCore.Qt.DisplayRole)
+            self.schedule_task_requested.emit(task, _qdate_to_date(due))
         elif column == Column.Snoozed:
             snoozed = item.data(QtCore.Qt.DisplayRole)
             self.snooze_task_requested.emit(task, _qdate_to_date(snoozed))
-
-    def _sub_task_item_changed(
-            self,
-            item: QtGui.QStandardItem,
-            sub_task: SubTask,
-            column: Column) -> None:
-        if column == Column.Name:
-            new_name = item.data(QtCore.Qt.DisplayRole)
-            self.rename_sub_task_requested.emit(sub_task, new_name)
-        elif column == Column.Due:
-            due = item.data(QtCore.Qt.DisplayRole)
-            self.schedule_sub_task_requested.emit(sub_task, _qdate_to_date(due))
-        elif column == Column.Snoozed:
-            snoozed = item.data(QtCore.Qt.DisplayRole)
-            self.snooze_sub_task_requested.emit(sub_task, _qdate_to_date(snoozed))
 
 
 def _build_model_and_connect(

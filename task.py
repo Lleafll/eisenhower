@@ -20,30 +20,9 @@ class SubTask:
 class Task:
     name: str = "Task"
     importance: Importance = Importance.Unimportant
-    sub_tasks: Tuple[SubTask, ...] = field(default_factory=tuple)
     completed: Optional[date] = None
-
-    @property
-    def snooze(self) -> Optional[date]:
-        try:
-            if any(not has_snoozed_date(sub_task) for sub_task in self.sub_tasks):
-                return None
-            else:
-                return min([sub_task.snooze for sub_task in self.sub_tasks if has_snoozed_date(sub_task)])
-        except ValueError:
-            return None
-
-    @property
-    def due(self) -> Optional[date]:
-        try:
-            if not all(has_snoozed_date(sub_task) for sub_task in self.sub_tasks):
-                return min(
-                    [sub_task.due for sub_task in self.sub_tasks
-                     if sub_task.due is not None and not has_snoozed_date(sub_task)])
-            else:
-                return min([sub_task.due for sub_task in self.sub_tasks if sub_task.due is not None])
-        except ValueError:
-            return None
+    due: Optional[date] = None
+    snooze: Optional[date] = None
 
 
 def is_urgent(task: Union[Task, SubTask]) -> bool:

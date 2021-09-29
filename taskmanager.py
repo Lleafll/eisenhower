@@ -148,23 +148,24 @@ def _replace_sub_task(
             return
 
 
-def sanitize_sub_task(sub_task: SubTask) -> SubTask:
+def sanitize_sub_task(sub_task: SubTask, importance: Importance, completed: Optional[date]) -> Task:
+    due = sub_task.due
     if sub_task.due is not None and type(sub_task.due) != date:
-        due: QtCore.QDate = sub_task.due
-        return SubTask(
-            sub_task.name,
-            date(due.year(), due.month(), due.day()),
-            sub_task.snooze)
-    else:
-        return sub_task
-
-
-def _sanitize_task(task: Task) -> Task:
+        due: QtCore.QDate = date(due.year(), due.month(), due.day())
     return Task(
-        task.name,
-        task.importance,
-        tuple(sanitize_sub_task(sub_task) for sub_task in task.sub_tasks),
-        task.completed)
+        sub_task.name,
+        importance,
+        completed,
+        due,
+        sub_task.snooze)
+
+
+def _sanitize_task(task: Task) -> List[Task]:
+    if hasattr(task, "sub_tasks"):
+        return [sanitize_sub_task(
+            sub_task, task.importance, task.completed) for sub_task in task.sub_tasks]
+    else:
+        return task
 
 
 def load_task_manager(import_path: Path) -> TaskManager:
@@ -173,9 +174,10 @@ def load_task_manager(import_path: Path) -> TaskManager:
             tasks: Tasks = load(file)
     except FileNotFoundError:
         tasks = []
-    for i, task in enumerate(tasks):
-        tasks[i] = _sanitize_task(task)
-    return TaskManager(tasks)
+    sanitized_tasks = []
+    for task in tasks:
+        sanitized_tasks.extend(_sanitize_task(task))
+    return TaskManager(sanitized_tasks)
 
 
 def save_task_manager(export_path: Path, task_manager: TaskManager) -> None:

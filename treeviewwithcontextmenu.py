@@ -7,7 +7,7 @@ from task import (
     is_urgent,
     has_snoozed_date,
     is_completed,
-    Importance, SubTask)
+    Importance)
 
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
@@ -26,10 +26,8 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
     complete_task_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
-    delete_sub_task_requested = QtCore.Signal(SubTask)
-    remove_due_from_sub_task_requested = QtCore.Signal(SubTask)
+    remove_due_requested = QtCore.Signal(Task)
     remove_snooze_requested = QtCore.Signal(Task)
-    remove_snooze_from_sub_task_requested = QtCore.Signal(Task)
     set_important_requested = QtCore.Signal(Task)
     set_unimportant_requested = QtCore.Signal(Task)
 
@@ -73,60 +71,48 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         index = self.indexAt(point)
         context_menu = QtWidgets.QMenu()
         if index.isValid():
-            task: Union[Task, SubTask] = index.data(TASK_ROLE)
-            if isinstance(task, Task):
-                add_sub_task = QtGui.QAction("Add Subtask")
-                add_sub_task.triggered.connect(
-                    lambda: self.add_sub_task_requested.emit(task))
-                context_menu.addAction(add_sub_task)
-                if task.importance == Importance.Important:
-                    set_unimportant_task = QtGui.QAction("Make Unimportant")
-                    set_unimportant_task.triggered.connect(
-                        lambda: self.set_unimportant_requested.emit(task))
-                    context_menu.addAction(set_unimportant_task)
-                else:
-                    set_important_task = QtGui.QAction("Make Important")
-                    set_important_task.triggered.connect(
-                        lambda: self.set_important_requested.emit(task))
-                    context_menu.addAction(set_important_task)
-                if has_snoozed_date(
-                        task) and Column.Snoozed in self._displayed_columns:
-                    remove_snooze_action = QtGui.QAction("Remove Snooze")
-                    remove_snooze_action.triggered.connect(
-                        lambda: self.remove_snooze_requested.emit(task))
-                    context_menu.addAction(remove_snooze_action)
-                if is_completed(task):
-                    if Column.Archived in self._displayed_columns:
-                        unarchive_action = QtGui.QAction("Unarchive")
-                        unarchive_action.triggered.connect(
-                            lambda: self.unarchive_task_requested.emit(task))
-                        context_menu.addAction(unarchive_action)
-                else:
-                    complete_action = QtGui.QAction("Complete")
-                    complete_action.triggered.connect(
-                        lambda: self.complete_task_requested.emit(task))
-                    context_menu.addAction(complete_action)
-                delete_action = QtGui.QAction("Delete")
-                delete_action.triggered.connect(
-                    lambda: self.delete_task_requested.emit(task))
-                context_menu.addAction(delete_action)
+            task: Task = index.data(TASK_ROLE)
+            add_sub_task = QtGui.QAction("Add Subtask")
+            add_sub_task.triggered.connect(
+                lambda: self.add_sub_task_requested.emit(task))
+            context_menu.addAction(add_sub_task)
+            if task.importance == Importance.Important:
+                set_unimportant_task = QtGui.QAction("Make Unimportant")
+                set_unimportant_task.triggered.connect(
+                    lambda: self.set_unimportant_requested.emit(task))
+                context_menu.addAction(set_unimportant_task)
             else:
-                if Column.Due in self._displayed_columns:
-                    if is_urgent(task):
-                        remove_due_action = QtGui.QAction("Remove Due")
-                        remove_due_action.triggered.connect(
-                            lambda: self.remove_due_from_sub_task_requested.emit(task))
-                        context_menu.addAction(remove_due_action)
-                if has_snoozed_date(
-                        task) and Column.Snoozed in self._displayed_columns:
-                    remove_snooze_action = QtGui.QAction("Remove Snooze")
-                    remove_snooze_action.triggered.connect(
-                        lambda: self.remove_snooze_from_sub_task_requested.emit(task))
-                    context_menu.addAction(remove_snooze_action)
-                delete_action = QtGui.QAction("Delete")
-                delete_action.triggered.connect(
-                    lambda: self.delete_sub_task_requested.emit(task))
-                context_menu.addAction(delete_action)
+                set_important_task = QtGui.QAction("Make Important")
+                set_important_task.triggered.connect(
+                    lambda: self.set_important_requested.emit(task))
+                context_menu.addAction(set_important_task)
+            if Column.Due in self._displayed_columns:
+                if is_urgent(task):
+                    remove_due_action = QtGui.QAction("Remove Due")
+                    remove_due_action.triggered.connect(
+                        lambda: self.remove_due_requested.emit(task))
+                    context_menu.addAction(remove_due_action)
+            if has_snoozed_date(
+                    task) and Column.Snoozed in self._displayed_columns:
+                remove_snooze_action = QtGui.QAction("Remove Snooze")
+                remove_snooze_action.triggered.connect(
+                    lambda: self.remove_snooze_requested.emit(task))
+                context_menu.addAction(remove_snooze_action)
+            if is_completed(task):
+                if Column.Archived in self._displayed_columns:
+                    unarchive_action = QtGui.QAction("Unarchive")
+                    unarchive_action.triggered.connect(
+                        lambda: self.unarchive_task_requested.emit(task))
+                    context_menu.addAction(unarchive_action)
+            else:
+                complete_action = QtGui.QAction("Complete")
+                complete_action.triggered.connect(
+                    lambda: self.complete_task_requested.emit(task))
+                context_menu.addAction(complete_action)
+            delete_action = QtGui.QAction("Delete")
+            delete_action.triggered.connect(
+                lambda: self.delete_task_requested.emit(task))
+            context_menu.addAction(delete_action)
         if len(context_menu.actions()) > 0:
             context_menu.exec_(self.viewport().mapToGlobal(point))
 
@@ -170,31 +156,6 @@ def _build_row(
                 task.snooze if has_snoozed_date(task) else None)
         elif column == Column.Archived:
             item = _build_date_item(task.completed)
-            item.setEditable(False)
-        else:
-            raise RuntimeError("Unhandled column")
-        item.setData(task, role=TASK_ROLE)
-        items.append(item)
-    for sub_task in task.sub_tasks:
-        row = _build_sub_task_row(sub_task, columns)
-        items[0].appendRow(row)
-    return items
-
-
-def _build_sub_task_row(
-        task: SubTask,
-        columns: Sequence[Column]) -> Sequence[QtGui.QStandardItem]:
-    items = []
-    for column in columns:
-        if column == Column.Name:
-            item = QtGui.QStandardItem(task.name)
-        elif column == Column.Due:
-            item = _build_due_date_item(task.due)
-        elif column == Column.Snoozed:
-            item = _build_date_item(
-                task.snooze if has_snoozed_date(task) else None)
-        elif column == Column.Archived:
-            item = _build_date_item(None)
             item.setEditable(False)
         else:
             raise RuntimeError("Unhandled column")
