@@ -148,11 +148,22 @@ def _replace_sub_task(
             return
 
 
+def sanitize_sub_task(sub_task: SubTask) -> SubTask:
+    if type(sub_task.due) == QtCore.QDate:
+        due: QtCore.QDate = sub_task.due
+        return SubTask(
+            sub_task.name,
+            date(due.year(), due.month(), due.day()),
+            sub_task.snooze)
+    else:
+        return sub_task
+
+
 def _sanitize_task(task: Task) -> Task:
     return Task(
         task.name,
         task.importance,
-        task.sub_tasks,
+        tuple(sanitize_sub_task(sub_task) for sub_task in task.sub_tasks),
         task.completed)
 
 

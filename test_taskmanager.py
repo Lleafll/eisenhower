@@ -1,7 +1,9 @@
 from unittest import TestCase
+from PySide6 import QtCore
+from datetime import date
 
 from task import Task, SubTask
-from taskmanager import TaskManager
+from taskmanager import TaskManager, sanitize_sub_task
 
 
 class TestTaskManager(TestCase):
@@ -20,3 +22,7 @@ class TestTaskManager(TestCase):
         self.assertEqual(
             task_manager.tasks(),
             [Task()])
+
+    def test_sanitize_sub_task(self):
+        sub_task = SubTask("Name", QtCore.QDate(2001, 12, 24))
+        self.assertEqual(sanitize_sub_task(sub_task), SubTask("Name", date(2001, 12, 24)))
