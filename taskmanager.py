@@ -49,6 +49,11 @@ class TaskManager:
         new_task = replace(task, name=new_name)
         _replace(tasks, task, new_task)
 
+    def remove_due(self, task: Task) -> None:
+        tasks = self._history.advance_history()
+        new_task = replace(task, due=None)
+        _replace(tasks, task, new_task)
+
     def remove_snooze(self, task: Task) -> None:
         tasks = self._history.advance_history()
         new_task = replace(task, snooze=None)
