@@ -1,8 +1,11 @@
-from typing import Optional, List
+from typing import Optional, List, cast
 from datetime import date
 from dataclasses import replace
 from pickle import load, dump
 from pathlib import Path
+
+from PySide6 import QtCore
+
 from task import Task, Importance, SubTask
 from history import History, Tasks
 
@@ -94,7 +97,8 @@ def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
 def sanitize_sub_task(sub_task: SubTask, importance: Importance, completed: Optional[date]) -> Task:
     due = sub_task.due
     if sub_task.due is not None and type(sub_task.due) != date:
-        due: date = date(due.year(), due.month(), due.day())
+        qdate_due = cast(QtCore.QDate, due)
+        due: date = date(qdate_due.year(), qdate_due.month(), qdate_due.day())
     return Task(
         sub_task.name,
         importance,
