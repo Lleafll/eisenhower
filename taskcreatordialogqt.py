@@ -84,11 +84,11 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
         if self._no_due_button.isChecked():
             due: Optional[date] = None
         else:
-            due = self._due_date_widget.selectedDate()
+            due = self._due_date_widget.selectedDate().toPython()
         if self._no_snooze_button.isChecked():
             snooze: Optional[date] = None
         else:
-            snooze = self._snoozed_date_widget.selectedDate()
+            snooze = self._snoozed_date_widget.selectedDate().toPython()
         return Task(
             name=name,
             importance=importance,
