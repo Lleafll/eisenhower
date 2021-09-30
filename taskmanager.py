@@ -5,7 +5,6 @@ from pickle import load, dump
 from pathlib import Path
 from task import Task, Importance, SubTask
 from history import History, Tasks
-from PySide2 import QtCore
 
 
 class TaskManager:
@@ -95,7 +94,7 @@ def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
 def sanitize_sub_task(sub_task: SubTask, importance: Importance, completed: Optional[date]) -> Task:
     due = sub_task.due
     if sub_task.due is not None and type(sub_task.due) != date:
-        due: QtCore.QDate = date(due.year(), due.month(), due.day())
+        due: date = date(due.year(), due.month(), due.day())
     return Task(
         sub_task.name,
         importance,
