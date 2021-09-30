@@ -95,7 +95,7 @@ class TaskCreatorDialogQt(QtWidgets.QDialog):
             [SubTask(name, due, snooze)])
 
     @staticmethod
-    def askNewTask(
+    def ask_new_task(
             parent: Optional[QtWidgets.QWidget] = None,
             task: Task = _default_task) -> Optional[Task]:
         dialog = TaskCreatorDialogQt(task, parent)

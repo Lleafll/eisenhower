@@ -172,7 +172,7 @@ class MainWindowQt(QtWidgets.QWidget):
     def _add_task(self) -> None:
         if self._task_manager is None:
             return
-        task = TaskCreatorDialogQt.askNewTask(self)
+        task = TaskCreatorDialogQt.ask_new_task(self)
         if task is None:
             return
         self._task_manager.instance.add(task)
