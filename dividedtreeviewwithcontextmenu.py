@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, cast
 from datetime import date
 from PySide6 import QtWidgets, QtCore, QtGui
 from treeviewwithcontextmenu import (
@@ -21,6 +21,7 @@ class CalendarDelegate(QtWidgets.QStyledItemDelegate):
             self,
             editor: QtWidgets.QWidget,
             index: QtCore.QModelIndex) -> None:
+        editor = cast(QtWidgets.QDateEdit, editor)
         date_ = index.model().data(index, QtCore.Qt.DisplayRole)
         if date_.isNull():
             date_ = QtCore.QDate.currentDate()
@@ -31,6 +32,7 @@ class CalendarDelegate(QtWidgets.QStyledItemDelegate):
             editor: QtWidgets.QWidget,
             model: QtCore.QAbstractItemModel,
             index: QtCore.QModelIndex) -> None:
+        editor = cast(QtWidgets.QDateEdit, editor)
         model.setData(index, editor.date())
 
 
