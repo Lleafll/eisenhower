@@ -1,4 +1,4 @@
-from typing import Optional, Iterable, Sequence, Union
+from typing import Optional, Iterable, Sequence
 from datetime import date
 from enum import Enum, auto
 from PySide6 import QtWidgets, QtCore, QtGui
