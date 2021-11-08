@@ -1,7 +1,7 @@
-from datetime import date, timedelta
+from datetime import date
 from unittest import TestCase
 
-from task import Task, is_urgent, has_snoozed_date
+from task import Task, is_urgent
 
 
 class TestTask(TestCase):

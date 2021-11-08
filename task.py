@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import Enum, auto
 from typing import Optional, Iterable, Tuple, List, Union
@@ -9,6 +9,7 @@ class Importance(Enum):
     Unimportant = auto()
 
 
+# Deprecated
 @dataclass(frozen=True)
 class SubTask:
     name: str = "SubTask"
@@ -25,20 +26,20 @@ class Task:
     snooze: Optional[date] = None
 
 
-def is_urgent(task: Union[Task, SubTask]) -> bool:
+def is_urgent(task: Task) -> bool:
     due = task.due
     if due is None:
         return False
     return (due - date.today()) < timedelta(days=14)
 
 
-def has_snoozed_date(task: Union[Task, SubTask]) -> bool:
+def has_snoozed_date(task: Task) -> bool:
     if task.snooze is None:
         return False
     return task.snooze > date.today()
 
 
-def is_completed(task: Union[Task, SubTask]) -> bool:
+def is_completed(task: Task) -> bool:
     return task.completed is not None
 
 
