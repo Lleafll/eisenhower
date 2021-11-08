@@ -41,7 +41,7 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.setSelectionMode(QtWidgets.QAbstractItemView.NoSelection)
         self.setContextMenuPolicy(QtCore.Qt.CustomContextMenu)
         self.customContextMenuRequested.connect(self._open_context_menu)
-        self.setRootIsDecorated(True)
+        self.setRootIsDecorated(False)
         self.setEditTriggers(
                 QtWidgets.QAbstractItemView.EditKeyPressed |
                 QtWidgets.QAbstractItemView.AnyKeyPressed |
