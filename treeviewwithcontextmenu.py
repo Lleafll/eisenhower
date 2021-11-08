@@ -1,6 +1,6 @@
-from typing import Optional, Iterable, Sequence
 from datetime import date
 from enum import Enum, auto
+from typing import Optional, Iterable, Sequence
 from PySide6 import QtWidgets, QtCore, QtGui
 from task import (
     Task,
@@ -8,7 +8,6 @@ from task import (
     has_snoozed_date,
     is_completed,
     Importance)
-
 
 TASK_ROLE = QtCore.Qt.UserRole + 1
 
@@ -43,10 +42,10 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         self.customContextMenuRequested.connect(self._open_context_menu)
         self.setRootIsDecorated(False)
         self.setEditTriggers(
-                QtWidgets.QAbstractItemView.EditKeyPressed |
-                QtWidgets.QAbstractItemView.AnyKeyPressed |
-                QtWidgets.QAbstractItemView.SelectedClicked |
-                QtWidgets.QAbstractItemView.DoubleClicked)
+            QtWidgets.QAbstractItemView.EditKeyPressed |
+            QtWidgets.QAbstractItemView.AnyKeyPressed |
+            QtWidgets.QAbstractItemView.SelectedClicked |
+            QtWidgets.QAbstractItemView.DoubleClicked)
         self.setAlternatingRowColors(True)
         palette = self.palette()
         base_color = color.lighter(115)
@@ -67,49 +66,33 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         return self._displayed_columns
 
     def _open_context_menu(self, point: QtCore.QPoint) -> None:
-        index = self.indexAt(point)
-        context_menu = QtWidgets.QMenu()
-        if index.isValid():
+        actions: list[QtGui.QAction] = []
+
+        def add_action(name: str, signal: QtCore.Signal) -> None:
+            set_unimportant_task = QtGui.QAction(name)
+            set_unimportant_task.triggered.connect(lambda: signal.emit(task))
+            actions.append(set_unimportant_task)
+
+        if (index := self.indexAt(point)).isValid():
             task: Task = index.data(TASK_ROLE)
             if task.importance == Importance.Important:
-                set_unimportant_task = QtGui.QAction("Make Unimportant")
-                set_unimportant_task.triggered.connect(
-                    lambda: self.set_unimportant_requested.emit(task))
-                context_menu.addAction(set_unimportant_task)
+                add_action("Make Unimportant", self.set_unimportant_requested)
             else:
-                set_important_task = QtGui.QAction("Make Important")
-                set_important_task.triggered.connect(
-                    lambda: self.set_important_requested.emit(task))
-                context_menu.addAction(set_important_task)
+                add_action("Make Important", self.set_important_requested)
             if Column.Due in self._displayed_columns:
                 if is_urgent(task):
-                    remove_due_action = QtGui.QAction("Remove Due")
-                    remove_due_action.triggered.connect(
-                        lambda: self.remove_due_requested.emit(task))
-                    context_menu.addAction(remove_due_action)
+                    add_action("Remove Due", self.remove_due_requested)
             if has_snoozed_date(
                     task) and Column.Snoozed in self._displayed_columns:
-                remove_snooze_action = QtGui.QAction("Remove Snooze")
-                remove_snooze_action.triggered.connect(
-                    lambda: self.remove_snooze_requested.emit(task))
-                context_menu.addAction(remove_snooze_action)
+                add_action("Remove Snooze", self.remove_snooze_requested)
             if is_completed(task):
                 if Column.Archived in self._displayed_columns:
-                    unarchive_action = QtGui.QAction("Unarchive")
-                    unarchive_action.triggered.connect(
-                        lambda: self.unarchive_task_requested.emit(task))
-                    context_menu.addAction(unarchive_action)
+                    add_action("Unarchive", self.unarchive_task_requested)
             else:
-                complete_action = QtGui.QAction("Complete")
-                complete_action.triggered.connect(
-                    lambda: self.complete_task_requested.emit(task))
-                context_menu.addAction(complete_action)
-            delete_action = QtGui.QAction("Delete")
-            delete_action.triggered.connect(
-                lambda: self.delete_task_requested.emit(task))
-            context_menu.addAction(delete_action)
-        if len(context_menu.actions()) > 0:
-            context_menu.exec_(self.viewport().mapToGlobal(point))
+                add_action("Complete", self.complete_task_requested)
+            add_action("Delete", self.delete_task_requested)
+        context_menu = QtWidgets.QMenu(self)
+        context_menu.exec(actions, self.viewport().mapToGlobal(point))
 
 
 def _date_to_qdate(task_date: Optional[date]) -> QtCore.QDate:
