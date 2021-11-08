@@ -71,10 +71,6 @@ class TreeViewWithContextMenu(QtWidgets.QTreeView):
         context_menu = QtWidgets.QMenu()
         if index.isValid():
             task: Task = index.data(TASK_ROLE)
-            add_sub_task = QtGui.QAction("Add Subtask")
-            add_sub_task.triggered.connect(
-                lambda: self.add_sub_task_requested.emit(task))
-            context_menu.addAction(add_sub_task)
             if task.importance == Importance.Important:
                 set_unimportant_task = QtGui.QAction("Make Unimportant")
                 set_unimportant_task.triggered.connect(
