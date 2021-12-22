@@ -16,6 +16,12 @@ def test_delete() -> None:
     assert manager.tasks() == [Task("jdoi")]
 
 
+def test_delete_with_invalid_task_is_noop() -> None:
+    manager = TaskManager([Task("fiog")])
+    manager.delete(Task("fop"))
+    assert manager.tasks() == [Task("fiog")]
+
+
 def test_replace() -> None:
     manager = TaskManager([Task("fnk"), Task("fkop")])
     manager.replace(Task("fkop"), Task("f0ß"))
