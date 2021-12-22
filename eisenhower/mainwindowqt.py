@@ -5,7 +5,7 @@ from datetime import date
 from itertools import filterfalse
 from PySide6 import QtWidgets, QtGui, QtCore
 
-from pickleserializer import PickleSerializer
+from jsonserializer import JsonSerializer
 from task import (
     Task,
     is_completed,
@@ -36,7 +36,7 @@ def _style_button(button: QtWidgets.QPushButton) -> None:
 class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
-        self._serializer: Optional[PickleSerializer] = None
+        self._serializer: Optional[JsonSerializer] = None
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
@@ -117,7 +117,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._update()
 
     def load_from_file(self, path: Path) -> None:
-        self._serializer = PickleSerializer(path)
+        self._serializer = JsonSerializer(path)
         task_manager = TaskManager(self._serializer.load())
         if isinstance(task_manager, TaskManager):
             self._task_manager = TaskManagerWrapper(task_manager, path)
