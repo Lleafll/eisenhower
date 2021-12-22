@@ -11,7 +11,7 @@ class JsonSerializer:
 
     def save(self, tasks: Sequence[Task]) -> None:
         with open(self._path, "w") as file:
-            json.dump(to_primitive_dicts(tasks), file)
+            json.dump(to_primitive_dicts(tasks), file, indent=4)
 
     def load(self) -> list[Task]:
         try:
