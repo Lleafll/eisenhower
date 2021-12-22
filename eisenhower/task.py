@@ -83,13 +83,17 @@ def to_primitive_dicts(tasks: Sequence[Task]) -> list[dict]:
     return [_to_primitive_dict(i) for i in tasks]
 
 
+def _date_from_string(string: Optional[str]) -> Optional[date]:
+    return date.fromisoformat(string) if string is not None else None
+
+
 def _task_from_primitive_dict(from_dict: dict) -> Task:
     return Task(
         from_dict["name"],
         Importance[from_dict["importance"]],
-        from_dict["completed"],
-        from_dict["due"],
-        from_dict["snooze"])
+        _date_from_string(from_dict["completed"]),
+        _date_from_string(from_dict["due"]),
+        _date_from_string(from_dict["snooze"]))
 
 
 def tasks_from_primitive_dicts(dicts: list[dict]) -> list[Task]:

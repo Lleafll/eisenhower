@@ -101,3 +101,21 @@ def test_tasks_from_primitive_dicts() -> None:
     }]
     expected = [Task("bgfb")]
     assert tasks_from_primitive_dicts(dicts) == expected
+
+
+def test_tasks_from_primitive_dicts_with_dates() -> None:
+    dicts = [{
+        "name": "algo",
+        "importance": "Unimportant",
+        "completed": "1472-06-08",
+        "due": "1984-05-07",
+        "snooze": "1495-01-08"
+    }]
+    expected = [Task(
+        "algo",
+        completed=date(1472, 6, 8),
+        due=date(1984, 5, 7),
+        snooze=date(1495, 1, 8),
+    )]
+    assert tasks_from_primitive_dicts(dicts) == expected
+
