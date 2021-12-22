@@ -73,4 +73,18 @@ def _to_primitive_dict(task: Task) -> dict:
 
 
 def to_primitive_dicts(tasks: Sequence[Task]) -> list[dict]:
-    return [_to_primitive_dict(task) for task in tasks]
+    return [_to_primitive_dict(i) for i in tasks]
+
+
+def _task_from_primitive_dict(from_dict: dict) -> Task:
+    return Task(
+        from_dict["name"],
+        Importance[from_dict["importance"]],
+        from_dict["completed"],
+        from_dict["due"],
+        from_dict["snooze"]
+    )
+
+
+def tasks_from_primitive_dicts(dicts: list[dict]) -> list[Task]:
+    return [_task_from_primitive_dict(i) for i in dicts]

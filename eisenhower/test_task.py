@@ -7,7 +7,7 @@ from task import (
     is_completed,
     is_important,
     Importance,
-    to_primitive_dicts)
+    to_primitive_dicts, tasks_from_primitive_dicts)
 
 
 def test_snooze_empty_task() -> None:
@@ -73,3 +73,15 @@ def test_to_primitive_dicts() -> None:
         "snooze": None
     }]
     assert to_primitive_dicts(tasks) == expected
+
+
+def test_tasks_from_primitive_dicts() -> None:
+    dicts = [{
+        "name": "bgfb",
+        "importance": "Unimportant",
+        "completed": None,
+        "due": None,
+        "snooze": None
+    }]
+    expected = [Task("bgfb")]
+    assert tasks_from_primitive_dicts(dicts) == expected
