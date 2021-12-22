@@ -154,8 +154,7 @@ class MainWindowQt(QtWidgets.QWidget):
                     (_is_drop_task, self._drop_list)):
                 task_list.show()
                 task_list_tasks = list(filter(filter_func, non_archived_tasks))
-                if len(task_list_tasks) > 0:
-                    task_list.add_tasks(task_list_tasks)
+                task_list.add_tasks(task_list_tasks)
             archive_model = build_tree_view_model(
                 self._archive_view.columns(), archived_tasks)
             self._archive_view.setModel(archive_model)
