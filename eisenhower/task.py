@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, timedelta
 from enum import Enum, auto
-from typing import Optional, Iterable, Tuple, List, Union
+from typing import Optional, Iterable, Tuple, List
 
 
 class Importance(Enum):
