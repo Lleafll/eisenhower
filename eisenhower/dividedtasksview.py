@@ -46,7 +46,7 @@ class ItemWordWrap(QtWidgets.QStyledItemDelegate):
         return size
 
 
-class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
+class DividedTasksView(QtWidgets.QWidget):
     add_task_requested = QtCore.Signal()
     complete_task_requested = QtCore.Signal(Task)
     delete_task_requested = QtCore.Signal(Task)
@@ -135,7 +135,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
 def _build_model_and_connect(
         task_list: TasksView,
         tasks: Sequence[Task],
-        view: SeparatedTreeViewWithContextMenu) -> None:
+        view: DividedTasksView) -> None:
     model = build_tree_view_model(task_list.columns(), tasks)
     task_list.setModel(model)
     task_list.expandAll()

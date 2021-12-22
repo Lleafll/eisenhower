@@ -12,7 +12,7 @@ from task import (
     Importance)
 from taskmanager import (
     TaskManager, load_task_manager, save_task_manager)
-from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
+from dividedtasksview import DividedTasksView
 from tasksview import (
     TasksView, build_tree_view_model, Column)
 from taskcreatordialogqt import TaskCreatorDialogQt
@@ -64,13 +64,13 @@ class MainWindowQt(QtWidgets.QWidget):
         button_layout.addWidget(self._show_archive_button)
         button_layout.addWidget(self._priority_button)
         button_layout.addStretch()
-        self._do_list = SeparatedTreeViewWithContextMenu(
+        self._do_list = DividedTasksView(
             "Do", QtGui.QColor(240, 98, 146), self)
-        self._decide_list = SeparatedTreeViewWithContextMenu(
+        self._decide_list = DividedTasksView(
             "Decide", QtGui.QColor(255, 149, 157), self)
-        self._delegate_list = SeparatedTreeViewWithContextMenu(
+        self._delegate_list = DividedTasksView(
             "Delegate", QtGui.QColor(255, 215, 140), self)
-        self._drop_list = SeparatedTreeViewWithContextMenu(
+        self._drop_list = DividedTasksView(
             "Drop", QtGui.QColor(128, 222, 234), self)
         task_layout = QtWidgets.QHBoxLayout()
         task_layout.setContentsMargins(0, 0, 0, 0)
