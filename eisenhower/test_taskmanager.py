@@ -36,6 +36,12 @@ def test_set_complete() -> None:
     assert manager.tasks() == [Task("fj9", completed=None)]
 
 
+def test_set_complete_on_invalid_task_is_noop() -> None:
+    manager = TaskManager([Task("gig")])
+    manager.set_complete(Task("dsoap"))
+    assert manager.tasks() == [Task("gig")]
+
+
 def test_schedule_task() -> None:
     manager = TaskManager([Task("g5")])
     manager.schedule_task(Task("g5"), date(2, 5, 7))
