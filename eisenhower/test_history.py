@@ -53,3 +53,10 @@ def test_go_forward_in_time_throws_when_no_future() -> None:
     history = History([Task("gsdjmpk")])
     with pytest.raises(HistoryError):
         history.go_forward_in_time()
+
+
+def test_advance_history_deletes_old_future() -> None:
+    history = History([Task("cmap")])
+    history.advance_history()[0] = Task("jgio")
+    history.go_back_in_time()
+    assert history.advance_history() == [Task("cmap")]
