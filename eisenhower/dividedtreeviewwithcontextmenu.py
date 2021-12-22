@@ -1,8 +1,8 @@
 from typing import Sequence, cast
 from datetime import date
 from PySide6 import QtWidgets, QtCore, QtGui
-from treeviewwithcontextmenu import (
-        TreeViewWithContextMenu, TASK_ROLE, build_tree_view_model, Column)
+from tasksview import (
+    TasksView, TASK_ROLE, build_tree_view_model, Column)
 from task import Task, sort_tasks_by_relevance
 
 
@@ -73,9 +73,9 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
         header_label_palette.setColor(
             header_label.foregroundRole(), QtGui.QColor(114, 118, 138))
         header_label.setPalette(header_label_palette)
-        self._upper_list = TreeViewWithContextMenu(
+        self._upper_list = TasksView(
             (Column.Name, Column.Due, Column.Snoozed), color, self)
-        self._lower_list = TreeViewWithContextMenu(
+        self._lower_list = TasksView(
             (Column.Name, Column.Due, Column.Snoozed), color, self)
         layout = QtWidgets.QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -110,7 +110,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
 
     def item_changed(
             self,
-            task_list: TreeViewWithContextMenu,
+            task_list: TasksView,
             item: QtGui.QStandardItem) -> None:
         task = item.data(TASK_ROLE)
         column = task_list.columns()[item.column()]
@@ -133,7 +133,7 @@ class SeparatedTreeViewWithContextMenu(QtWidgets.QWidget):
 
 
 def _build_model_and_connect(
-        task_list: TreeViewWithContextMenu,
+        task_list: TasksView,
         tasks: Sequence[Task],
         view: SeparatedTreeViewWithContextMenu) -> None:
     model = build_tree_view_model(task_list.columns(), tasks)

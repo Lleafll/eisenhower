@@ -13,8 +13,8 @@ from task import (
 from taskmanager import (
     TaskManager, load_task_manager, save_task_manager)
 from dividedtreeviewwithcontextmenu import SeparatedTreeViewWithContextMenu
-from treeviewwithcontextmenu import (
-    TreeViewWithContextMenu, build_tree_view_model, Column)
+from tasksview import (
+    TasksView, build_tree_view_model, Column)
 from taskcreatordialogqt import TaskCreatorDialogQt
 
 
@@ -101,7 +101,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._add_task_button.clicked.connect(self._add_task)
         self._show_archive_button.clicked.connect(self._show_archive)
         self._priority_button.toggled.connect(self._toggle_priority)
-        self._archive_view = TreeViewWithContextMenu(
+        self._archive_view = TasksView(
             (Column.Name, Column.Archived),
             QtGui.QColor(255, 255, 255),
             self)

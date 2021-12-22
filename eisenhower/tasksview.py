@@ -19,7 +19,7 @@ class Column(Enum):
     Archived = auto()
 
 
-class TreeViewWithContextMenu(QtWidgets.QTreeView):
+class TasksView(QtWidgets.QTreeView):
     add_task_requested = QtCore.Signal()
     complete_task_requested = QtCore.Signal(Task)
     unarchive_task_requested = QtCore.Signal(Task)
