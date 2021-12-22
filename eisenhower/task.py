@@ -1,7 +1,7 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from datetime import date, timedelta
 from enum import Enum, auto
-from typing import Optional, Iterable, Tuple, List
+from typing import Optional, Iterable, Sequence
 
 
 class Importance(Enum):
@@ -49,11 +49,11 @@ def is_important(task: Task) -> bool:
 
 def sort_tasks_by_relevance(
         tasks: Iterable[Task]) -> \
-        Tuple[List[Task], List[Task], List[Task], List[Task]]:
-    completed_tasks: List[Task] = []
-    snoozed_tasks: List[Task] = []
-    due_tasks: List[Task] = []
-    normal_tasks: List[Task] = []
+        tuple[list[Task], list[Task], list[Task], list[Task]]:
+    completed_tasks: list[Task] = []
+    snoozed_tasks: list[Task] = []
+    due_tasks: list[Task] = []
+    normal_tasks: list[Task] = []
     for task in tasks:
         if is_completed(task):
             completed_tasks.append(task)
@@ -64,3 +64,13 @@ def sort_tasks_by_relevance(
         else:
             normal_tasks.append(task)
     return due_tasks, normal_tasks, snoozed_tasks, completed_tasks
+
+
+def _to_primitive_dict(task: Task) -> dict:
+    primitive_dict = asdict(task)
+    primitive_dict["importance"] = task.importance.name
+    return primitive_dict
+
+
+def to_primitive_dicts(tasks: Sequence[Task]) -> list[dict]:
+    return [_to_primitive_dict(task) for task in tasks]

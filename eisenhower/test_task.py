@@ -1,7 +1,13 @@
 from datetime import date, timedelta
 
 from task import (
-    Task, is_urgent, has_snoozed_date, is_completed, is_important, Importance)
+    Task,
+    is_urgent,
+    has_snoozed_date,
+    is_completed,
+    is_important,
+    Importance,
+    to_primitive_dicts)
 
 
 def test_snooze_empty_task() -> None:
@@ -55,3 +61,15 @@ def test_is_important() -> None:
     assert not is_important(Task())
     assert not is_important(Task(importance=Importance.Unimportant))
     assert is_important(Task(importance=Importance.Important))
+
+
+def test_to_primitive_dicts() -> None:
+    tasks = [Task("gjnio")]
+    expected = [{
+        "name": "gjnio",
+        "importance": "Unimportant",
+        "completed": None,
+        "due": None,
+        "snooze": None
+    }]
+    assert to_primitive_dicts(tasks) == expected
