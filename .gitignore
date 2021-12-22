@@ -8,3 +8,4 @@ test.todo
 *.py1.stats
 /.idea/
 /venv/
+.coverage
