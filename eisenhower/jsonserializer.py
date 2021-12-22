@@ -14,5 +14,8 @@ class JsonSerializer:
             json.dump(to_primitive_dicts(tasks), file)
 
     def load(self) -> list[Task]:
-        with open(self._path, "r") as file:
-            return tasks_from_primitive_dicts(json.load(file))
+        try:
+            with open(self._path, "r") as file:
+                return tasks_from_primitive_dicts(json.load(file))
+        except FileNotFoundError:
+            return []
