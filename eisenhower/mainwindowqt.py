@@ -4,14 +4,15 @@ from dataclasses import dataclass
 from datetime import date
 from itertools import filterfalse
 from PySide6 import QtWidgets, QtGui, QtCore
+
+from pickleserializer import PickleSerializer
 from task import (
     Task,
     is_completed,
     is_urgent,
     is_important,
     Importance)
-from taskmanager import (
-    TaskManager, load_task_manager, save_task_manager)
+from taskmanager import TaskManager
 from dividedtasksview import DividedTasksView
 from tasksview import (
     TasksView, build_tree_view_model, Column)
@@ -35,6 +36,7 @@ def _style_button(button: QtWidgets.QPushButton) -> None:
 class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
+        self._serializer: Optional[PickleSerializer] = None
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
@@ -115,7 +117,8 @@ class MainWindowQt(QtWidgets.QWidget):
         self._update()
 
     def load_from_file(self, path: Path) -> None:
-        task_manager = load_task_manager(path)
+        self._serializer = PickleSerializer(path)
+        task_manager = TaskManager(self._serializer.load())
         if isinstance(task_manager, TaskManager):
             self._task_manager = TaskManagerWrapper(task_manager, path)
             self.setWindowTitle(path.name)
@@ -167,7 +170,8 @@ class MainWindowQt(QtWidgets.QWidget):
     def _update_and_save(self) -> None:
         if self._task_manager is None:
             return
-        save_task_manager(self._task_manager.path, self._task_manager.instance)
+        assert self._serializer is not None
+        self._serializer.save(self._task_manager.instance.tasks())
         self._update()
 
     def _add_task(self) -> None:

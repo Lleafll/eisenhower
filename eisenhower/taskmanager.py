@@ -1,12 +1,13 @@
 from typing import Optional, List, cast
 from datetime import date
 from dataclasses import replace
-from pickle import load, dump
+from pickle import load
 from pathlib import Path
+import json
 
 from PySide6 import QtCore
 
-from task import Task, Importance, SubTask
+from task import Task, Importance, SubTask, to_primitive_dicts
 from history import History, Tasks
 
 
@@ -97,41 +98,3 @@ def _complete(tasks: Tasks, old_task: Task, is_complete: bool) -> None:
 def _replace(tasks: Tasks, old_task: Task, new_task: Task) -> None:
     index = tasks.index(old_task)
     tasks[index] = new_task
-
-
-def sanitize_sub_task(sub_task: SubTask, importance: Importance, completed: Optional[date]) -> Task:
-    due = sub_task.due
-    if sub_task.due is not None and type(sub_task.due) != date:
-        qdate_due = cast(QtCore.QDate, due)
-        due: date = date(qdate_due.year(), qdate_due.month(), qdate_due.day())
-    return Task(
-        sub_task.name,
-        importance,
-        completed,
-        due,
-        sub_task.snooze)
-
-
-def _sanitize_task(task: Task) -> List[Task]:
-    if hasattr(task, "sub_tasks"):
-        return [sanitize_sub_task(
-            sub_task, task.importance, task.completed) for sub_task in task.sub_tasks]
-    else:
-        return [task]
-
-
-def load_task_manager(import_path: Path) -> TaskManager:
-    try:
-        with open(import_path, "rb") as file:
-            tasks: Tasks = load(file)
-    except FileNotFoundError:
-        tasks = []
-    sanitized_tasks = []
-    for task in tasks:
-        sanitized_tasks.extend(_sanitize_task(task))
-    return TaskManager(sanitized_tasks)
-
-
-def save_task_manager(export_path: Path, task_manager: TaskManager) -> None:
-    with open(export_path, "wb") as file:
-        return dump(task_manager.tasks(), file)
