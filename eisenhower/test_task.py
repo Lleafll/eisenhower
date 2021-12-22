@@ -75,6 +75,22 @@ def test_to_primitive_dicts() -> None:
     assert to_primitive_dicts(tasks) == expected
 
 
+def test_to_primitive_dicts_with_dates() -> None:
+    tasks = [Task(
+        "fd3",
+        completed=date(2, 5, 6),
+        due=date(3, 7, 4),
+        snooze=date(8, 4, 6))]
+    expected = [{
+        "name": "fd3",
+        "importance": "Unimportant",
+        "completed": "0002-05-06",
+        "due": "0003-07-04",
+        "snooze": "0008-04-06"
+    }]
+    assert to_primitive_dicts(tasks) == expected
+
+
 def test_tasks_from_primitive_dicts() -> None:
     dicts = [{
         "name": "bgfb",

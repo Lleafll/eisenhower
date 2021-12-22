@@ -66,10 +66,17 @@ def sort_tasks_by_relevance(
     return due_tasks, normal_tasks, snoozed_tasks, completed_tasks
 
 
+def _date_to_string(date_: Optional[date]) -> Optional[str]:
+    return date_.isoformat() if date_ is not None else None
+
+
 def _to_primitive_dict(task: Task) -> dict:
-    primitive_dict = asdict(task)
-    primitive_dict["importance"] = task.importance.name
-    return primitive_dict
+    return {
+        "name": task.name,
+        "importance": task.importance.name,
+        "completed": _date_to_string(task.completed),
+        "due": _date_to_string(task.due),
+        "snooze": _date_to_string(task.snooze)}
 
 
 def to_primitive_dicts(tasks: Sequence[Task]) -> list[dict]:
@@ -82,8 +89,7 @@ def _task_from_primitive_dict(from_dict: dict) -> Task:
         Importance[from_dict["importance"]],
         from_dict["completed"],
         from_dict["due"],
-        from_dict["snooze"]
-    )
+        from_dict["snooze"])
 
 
 def tasks_from_primitive_dicts(dicts: list[dict]) -> list[Task]:
