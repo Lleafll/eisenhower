@@ -21,6 +21,12 @@ class MockView:
     def hide_lists(self) -> None:
         self.hide_lists_calls += 1
 
+    def set_undoable(self, _) -> None:
+        pass
+
+    def set_redoable(self, _) -> None:
+        pass
+
 
 class MockSerializerWrapper:
     def __init__(self, tasks: list[Task]) -> None:

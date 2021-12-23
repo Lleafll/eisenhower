@@ -37,6 +37,8 @@ class MainPresenter:
         assert self._serializer is not None
         self._serializer.save(self._task_manager.tasks())
         self._view.update_tasks(self._task_manager.tasks())
+        self._view.set_undoable(self._task_manager.is_undoable())
+        self._view.set_redoable(self._task_manager.is_redoable())
 
     def add_task(self, task: Task) -> None:
         assert self._task_manager is not None
@@ -71,4 +73,14 @@ class MainPresenter:
     def set_importance(self, task: Task, importance: Importance) -> None:
         assert self._task_manager is not None
         self._task_manager.set_importance(task, importance)
+        self._save_and_update_view()
+
+    def undo(self) -> None:
+        assert self._task_manager is not None
+        self._task_manager.undo()
+        self._save_and_update_view()
+
+    def redo(self) -> None:
+        assert self._task_manager is not None
+        self._task_manager.redo()
         self._save_and_update_view()

@@ -1,29 +1,18 @@
-from dataclasses import dataclass
-from typing import Optional
 from pathlib import Path
-from datetime import date
 from itertools import filterfalse
 from PySide6 import QtWidgets, QtGui, QtCore
 
 from mainpresenter import MainPresenter
-from jsonserializer import JsonSerializer
 from task import (
     Task,
     is_completed,
     is_urgent,
     is_important,
     Importance)
-from taskmanager import TaskManager
 from dividedtasksview import DividedTasksView
 from tasksview import (
     TasksView, build_tree_view_model, Column)
 from taskcreatordialogqt import TaskCreatorDialogQt
-
-
-@dataclass(frozen=True)
-class TaskManagerWrapper:
-    instance: TaskManager
-    path: Path
 
 
 def _style_button(button: QtWidgets.QPushButton) -> None:
@@ -37,9 +26,7 @@ def _style_button(button: QtWidgets.QPushButton) -> None:
 class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
-        self._serializer: Optional[JsonSerializer] = None
         self._presenter = MainPresenter(self)
-        self._task_manager: Optional[TaskManagerWrapper] = None
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
@@ -107,8 +94,8 @@ class MainWindowQt(QtWidgets.QWidget):
             task_list.set_unimportant_requested.connect(
                 lambda task: self._presenter.set_importance(
                     task, Importance.Unimportant))
-        self._undo_button.clicked.connect(self._undo)
-        self._redo_button.clicked.connect(self._redo)
+        self._undo_button.clicked.connect(self._presenter.undo)
+        self._redo_button.clicked.connect(self._presenter.redo)
         self._add_task_button.clicked.connect(self._add_task)
         self._show_archive_button.clicked.connect(self._show_archive)
         self._priority_button.toggled.connect(self._toggle_priority)
@@ -165,41 +152,22 @@ class MainWindowQt(QtWidgets.QWidget):
         self._undo_button.show()
         self._redo_button.show()
         self._show_archive_button.show()
-        self._undo_button.setEnabled(
-            self._task_manager.instance.is_undoable())
-        self._redo_button.setEnabled(
-            self._task_manager.instance.is_redoable())
 
-    def _update_and_save(self) -> None:
-        if self._task_manager is None:
-            return
-        assert self._serializer is not None
-        self._serializer.save(self._task_manager.instance.tasks())
-        self.update()
+    def set_undoable(self, undoable: bool) -> None:
+        self._undo_button.setEnabled(undoable)
+
+    def set_redoable(self, redoable: bool) -> None:
+        self._redo_button.setEnabled(redoable)
 
     def _add_task(self) -> None:
         task = TaskCreatorDialogQt.ask_new_task(self)
         if task is not None:
             self._presenter.add_task(task)
 
-    def _undo(self) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.undo()
-        self._update_and_save()
-
-    def _redo(self) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.redo()
-        self._update_and_save()
-
     def _show_archive(self) -> None:
         self._archive_view.show()
 
     def _toggle_priority(self, is_toggled: bool) -> None:
-        if self._task_manager is None:
-            return
         self._do_list.show_snoozed_tasks(not is_toggled)
         for task_list in (
                 self._decide_list, self._delegate_list, self._drop_list):
