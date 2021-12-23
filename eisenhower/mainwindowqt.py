@@ -92,7 +92,8 @@ class MainWindowQt(QtWidgets.QWidget):
                 self._presenter.delete_task)
             task_list.rename_task_requested.connect(
                 self._presenter.rename_task)
-            task_list.schedule_task_requested.connect(self._set_task_due)
+            task_list.schedule_task_requested.connect(
+                self._presenter.set_task_due)
             task_list.snooze_task_requested.connect(self._set_task_snooze)
             task_list.add_task_requested.connect(self._add_task)
             task_list.remove_due_requested.connect(self._remove_due)
@@ -116,7 +117,8 @@ class MainWindowQt(QtWidgets.QWidget):
         self._archive_view.setWindowTitle("Task Archive")
         self._archive_view.sortByColumn(1, QtCore.Qt.SortOrder.DescendingOrder)
         self._archive_view.hide()
-        self._archive_view.delete_task_requested.connect(self._delete_task)
+        self._archive_view.delete_task_requested.connect(
+            self._presenter.delete_task)
         self._archive_view.unarchive_task_requested.connect(
             self._unarchive_task)
         self._presenter.request_update()
@@ -176,12 +178,6 @@ class MainWindowQt(QtWidgets.QWidget):
         task = TaskCreatorDialogQt.ask_new_task(self)
         if task is not None:
             self._presenter.add_task(task)
-
-    def _set_task_due(self, task: Task, due: Optional[date] = None) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.schedule_task(task, due)
-        self._update_and_save()
 
     def _set_task_snooze(self, task: Task, snooze: Optional[date] = None) -> None:
         if self._task_manager is None:

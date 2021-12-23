@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 from typing import Optional, Type, TypeVar
 from dataclasses import dataclass
@@ -56,4 +57,9 @@ class MainPresenter:
     def rename_task(self, task: Task, name: str) -> None:
         assert self._task_manager is not None
         self._task_manager.rename(task, name)
+        self._save_and_update_view()
+
+    def set_task_due(self, task: Task, due: Optional[date]) -> None:
+        assert self._task_manager is not None
+        self._task_manager.schedule_task(task, due)
         self._save_and_update_view()
