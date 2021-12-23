@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Optional
 
 from mainpresenter import MainPresenter
-from task import Task
+from task import Task, Importance
 
 
 class MockView:
@@ -136,3 +136,15 @@ def test_set_task_snooze() -> None:
     presenter.set_task_snooze(Task("know"), date(1, 2, 3))
     assert view.update_tasks_calls[-1] == [Task("know", snooze=date(1, 2, 3))]
     assert serializer_wrapper.tasks == [Task("know", snooze=date(1, 2, 3))]
+
+
+def test_set_importance() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("range")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path())
+    presenter.set_importance(Task("range"), Importance.Important)
+    assert view.update_tasks_calls[-1] \
+           == [Task("range", importance=Importance.Important)]
+    assert serializer_wrapper.tasks == \
+           [Task("range", importance=Importance.Important)]

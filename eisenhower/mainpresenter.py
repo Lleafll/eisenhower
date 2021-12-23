@@ -1,9 +1,8 @@
 from datetime import date
 from pathlib import Path
-from typing import Optional, Type, TypeVar
-from dataclasses import dataclass
+from typing import Optional, TypeVar
 
-from task import Task
+from task import Task, Importance
 from jsonserializer import JsonSerializer
 from taskmanager import TaskManager
 
@@ -67,4 +66,9 @@ class MainPresenter:
     def set_task_snooze(self, task: Task, snooze: Optional[date]) -> None:
         assert self._task_manager is not None
         self._task_manager.snooze(task, snooze)
+        self._save_and_update_view()
+
+    def set_importance(self, task: Task, importance: Importance) -> None:
+        assert self._task_manager is not None
+        self._task_manager.set_importance(task, importance)
         self._save_and_update_view()
