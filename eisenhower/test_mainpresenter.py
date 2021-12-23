@@ -96,3 +96,13 @@ def test_complete_task() -> None:
     assert view.update_tasks_calls[-1] \
            == [Task("bind", completed=date.today())]
     assert serializer_wrapper.tasks == [Task("bind", completed=date.today())]
+
+
+def test_delete_task() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("doc")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path(""))
+    presenter.delete_task(Task("doc"))
+    assert view.update_tasks_calls[-1] == []
+    assert serializer_wrapper.tasks == []

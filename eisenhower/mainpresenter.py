@@ -47,3 +47,8 @@ class MainPresenter:
         assert self._task_manager is not None
         self._task_manager.set_complete(task)
         self._save_and_update_view()
+
+    def delete_task(self, task: Task) -> None:
+        assert self._task_manager is not None
+        self._task_manager.delete(task)
+        self._save_and_update_view()
