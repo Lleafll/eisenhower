@@ -126,3 +126,13 @@ def test_set_task_due() -> None:
     presenter.set_task_due(Task("algo"), date(1, 2, 3))
     assert view.update_tasks_calls[-1] == [Task("algo", due=date(1, 2, 3))]
     assert serializer_wrapper.tasks == [Task("algo", due=date(1, 2, 3))]
+
+
+def test_set_task_snooze() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("know")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path(""))
+    presenter.set_task_snooze(Task("know"), date(1, 2, 3))
+    assert view.update_tasks_calls[-1] == [Task("know", snooze=date(1, 2, 3))]
+    assert serializer_wrapper.tasks == [Task("know", snooze=date(1, 2, 3))]

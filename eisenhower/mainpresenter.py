@@ -63,3 +63,8 @@ class MainPresenter:
         assert self._task_manager is not None
         self._task_manager.schedule_task(task, due)
         self._save_and_update_view()
+
+    def set_task_snooze(self, task: Task, snooze: Optional[date]) -> None:
+        assert self._task_manager is not None
+        self._task_manager.snooze(task, snooze)
+        self._save_and_update_view()

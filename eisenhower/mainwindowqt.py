@@ -94,7 +94,8 @@ class MainWindowQt(QtWidgets.QWidget):
                 self._presenter.rename_task)
             task_list.schedule_task_requested.connect(
                 self._presenter.set_task_due)
-            task_list.snooze_task_requested.connect(self._set_task_snooze)
+            task_list.snooze_task_requested.connect(
+                self._presenter.set_task_snooze)
             task_list.add_task_requested.connect(self._add_task)
             task_list.remove_due_requested.connect(self._remove_due)
             task_list.remove_snooze_requested.connect(self._remove_snooze)
@@ -178,12 +179,6 @@ class MainWindowQt(QtWidgets.QWidget):
         task = TaskCreatorDialogQt.ask_new_task(self)
         if task is not None:
             self._presenter.add_task(task)
-
-    def _set_task_snooze(self, task: Task, snooze: Optional[date] = None) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.snooze(task, snooze)
-        self._update_and_save()
 
     def _set_importance(self, task: Task, importance: Importance) -> None:
         if self._task_manager is None:
