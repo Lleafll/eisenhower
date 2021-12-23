@@ -90,7 +90,8 @@ class MainWindowQt(QtWidgets.QWidget):
                 self._presenter.complete_task)
             task_list.delete_task_requested.connect(
                 self._presenter.delete_task)
-            task_list.rename_task_requested.connect(self._rename_task)
+            task_list.rename_task_requested.connect(
+                self._presenter.rename_task)
             task_list.schedule_task_requested.connect(self._set_task_due)
             task_list.snooze_task_requested.connect(self._set_task_snooze)
             task_list.add_task_requested.connect(self._add_task)
@@ -175,12 +176,6 @@ class MainWindowQt(QtWidgets.QWidget):
         task = TaskCreatorDialogQt.ask_new_task(self)
         if task is not None:
             self._presenter.add_task(task)
-
-    def _rename_task(self, task: Task, name: str) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.rename(task, name)
-        self._update_and_save()
 
     def _set_task_due(self, task: Task, due: Optional[date] = None) -> None:
         if self._task_manager is None:

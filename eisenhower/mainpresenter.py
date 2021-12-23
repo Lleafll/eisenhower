@@ -52,3 +52,8 @@ class MainPresenter:
         assert self._task_manager is not None
         self._task_manager.delete(task)
         self._save_and_update_view()
+
+    def rename_task(self, task: Task, name: str) -> None:
+        assert self._task_manager is not None
+        self._task_manager.rename(task, name)
+        self._save_and_update_view()

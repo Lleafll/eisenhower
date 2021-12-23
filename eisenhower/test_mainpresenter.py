@@ -106,3 +106,13 @@ def test_delete_task() -> None:
     presenter.delete_task(Task("doc"))
     assert view.update_tasks_calls[-1] == []
     assert serializer_wrapper.tasks == []
+
+
+def test_rename_task() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("wind")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path())
+    presenter.rename_task(Task("wind"), "imo")
+    assert view.update_tasks_calls[-1] == [Task("imo")]
+    assert serializer_wrapper.tasks == [Task("imo")]
