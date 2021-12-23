@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 from typing import Optional
 from pathlib import Path
-from dataclasses import dataclass
 from datetime import date
 from itertools import filterfalse
 from PySide6 import QtWidgets, QtGui, QtCore
 
+from mainpresenter import MainPresenter
 from jsonserializer import JsonSerializer
 from task import (
     Task,
@@ -37,13 +38,14 @@ class MainWindowQt(QtWidgets.QWidget):
     def __init__(self) -> None:
         super().__init__()
         self._serializer: Optional[JsonSerializer] = None
+        self._presenter = MainPresenter(self)
+        self._task_manager: Optional[TaskManagerWrapper] = None
         self.showMaximized()
         self.setWindowTitle("Eisenhower")
         self.setAcceptDrops(True)
         palette = self.palette()
         palette.setColor(QtGui.QPalette.Window, QtGui.QColor(50, 54, 76))
         self.setPalette(palette)
-        self._task_manager: Optional[TaskManagerWrapper] = None
         layout = QtWidgets.QHBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(0)
@@ -114,15 +116,10 @@ class MainWindowQt(QtWidgets.QWidget):
         self._archive_view.delete_task_requested.connect(self._delete_task)
         self._archive_view.unarchive_task_requested.connect(
             self._unarchive_task)
-        self._update()
+        self.update()
 
     def load_from_file(self, path: Path) -> None:
-        self._serializer = JsonSerializer(path)
-        task_manager = TaskManager(self._serializer.load())
-        if isinstance(task_manager, TaskManager):
-            self._task_manager = TaskManagerWrapper(task_manager, path)
-            self.setWindowTitle(path.name)
-            self._update()
+        self._presenter.load_from_file(path)
 
     def dragEnterEvent(self, event: QtGui.QDragEnterEvent) -> None:
         mime_data = event.mimeData()
@@ -134,44 +131,34 @@ class MainWindowQt(QtWidgets.QWidget):
         task_manager_path = Path(path.toLocalFile())
         self.load_from_file(task_manager_path)
 
-    def _update(self) -> None:
-        if self._task_manager is None:
-            self._do_list.hide()
-            self._decide_list.hide()
-            self._delegate_list.hide()
-            self._drop_list.hide()
-            self._undo_button.hide()
-            self._redo_button.hide()
-            self._show_archive_button.hide()
-        else:
-            tasks = self._task_manager.instance.tasks()
-            non_archived_tasks = list(filterfalse(is_completed, tasks))
-            archived_tasks = filter(is_completed, tasks)
-            for filter_func, task_list in (
-                    (_is_do_task, self._do_list),
-                    (_is_decide_task, self._decide_list),
-                    (_is_delegate_task, self._delegate_list),
-                    (_is_drop_task, self._drop_list)):
-                task_list.show()
-                task_list_tasks = list(filter(filter_func, non_archived_tasks))
-                task_list.add_tasks(task_list_tasks)
-            archive_model = build_tree_view_model(
-                self._archive_view.columns(), archived_tasks)
-            self._archive_view.setModel(archive_model)
-            self._undo_button.show()
-            self._redo_button.show()
-            self._show_archive_button.show()
-            self._undo_button.setEnabled(
-                self._task_manager.instance.is_undoable())
-            self._redo_button.setEnabled(
-                self._task_manager.instance.is_redoable())
+    def update_tasks(self, tasks: list[Task]) -> None:
+        non_archived_tasks = list(filterfalse(is_completed, tasks))
+        archived_tasks = filter(is_completed, tasks)
+        for filter_func, task_list in (
+                (_is_do_task, self._do_list),
+                (_is_decide_task, self._decide_list),
+                (_is_delegate_task, self._delegate_list),
+                (_is_drop_task, self._drop_list)):
+            task_list.show()
+            task_list_tasks = list(filter(filter_func, non_archived_tasks))
+            task_list.add_tasks(task_list_tasks)
+        archive_model = build_tree_view_model(
+            self._archive_view.columns(), archived_tasks)
+        self._archive_view.setModel(archive_model)
+        self._undo_button.show()
+        self._redo_button.show()
+        self._show_archive_button.show()
+        self._undo_button.setEnabled(
+            self._task_manager.instance.is_undoable())
+        self._redo_button.setEnabled(
+            self._task_manager.instance.is_redoable())
 
     def _update_and_save(self) -> None:
         if self._task_manager is None:
             return
         assert self._serializer is not None
         self._serializer.save(self._task_manager.instance.tasks())
-        self._update()
+        self.update()
 
     def _add_task(self) -> None:
         if self._task_manager is None:
