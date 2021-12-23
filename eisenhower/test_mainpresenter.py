@@ -9,12 +9,16 @@ class MockView:
     def __init__(self) -> None:
         self.update_tasks_calls: list[list[Task]] = []
         self.window_title = ""
+        self.hide_lists_calls = 0
 
     def update_tasks(self, tasks: list[Task]) -> None:
         self.update_tasks_calls.append(tasks)
 
     def setWindowTitle(self, title: str) -> None:
         self.window_title = title
+
+    def hide_lists(self) -> None:
+        self.hide_lists_calls += 1
 
 
 class MockSerializerWrapper:
@@ -39,3 +43,22 @@ def test_load_from_file() -> None:
     assert view.update_tasks_calls == [[Task("jabra")]]
     assert view.window_title == "load_path"
     assert serializer_wrapper.path == Path("load_path")
+
+
+def test_request_update_without_loaded_file_hides_lists() -> None:
+    view = MockView()
+    presenter = MainPresenter(view)
+    assert view.hide_lists_calls == 0
+    presenter.request_update()
+    assert view.hide_lists_calls == 1
+    assert view.update_tasks_calls == []
+
+
+def test_request_update_update_tasks_when_file_is_loaded() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("dill")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path("load_path"))
+    view.update_tasks_calls = []
+    presenter.request_update()
+    assert view.update_tasks_calls == [[Task("dill")]]

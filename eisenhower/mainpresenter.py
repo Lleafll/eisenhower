@@ -30,4 +30,10 @@ class MainPresenter:
         task_manager = TaskManager(self._serializer.load())
         self._task_manager = _TaskManagerWrapper(task_manager, path)
         self._view.setWindowTitle(path.name)
-        self._view.update_tasks(task_manager.tasks())
+        self.request_update()
+
+    def request_update(self) -> None:
+        if self._task_manager is None:
+            self._view.hide_lists()
+        else:
+            self._view.update_tasks(self._task_manager.instance.tasks())

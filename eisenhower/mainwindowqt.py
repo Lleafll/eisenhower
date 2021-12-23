@@ -116,7 +116,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._archive_view.delete_task_requested.connect(self._delete_task)
         self._archive_view.unarchive_task_requested.connect(
             self._unarchive_task)
-        self.update()
+        self._presenter.request_update()
 
     def load_from_file(self, path: Path) -> None:
         self._presenter.load_from_file(path)
@@ -130,6 +130,15 @@ class MainWindowQt(QtWidgets.QWidget):
         path = event.mimeData().urls()[0]
         task_manager_path = Path(path.toLocalFile())
         self.load_from_file(task_manager_path)
+
+    def hide_lists(self) -> None:
+        self._do_list.hide()
+        self._decide_list.hide()
+        self._delegate_list.hide()
+        self._drop_list.hide()
+        self._undo_button.hide()
+        self._redo_button.hide()
+        self._show_archive_button.hide()
 
     def update_tasks(self, tasks: list[Task]) -> None:
         non_archived_tasks = list(filterfalse(is_completed, tasks))
