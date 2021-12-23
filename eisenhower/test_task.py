@@ -7,7 +7,7 @@ from task import (
     is_completed,
     is_important,
     Importance,
-    to_primitive_dicts, tasks_from_primitive_dicts)
+    to_primitive_dicts, tasks_from_primitive_dicts, sort_tasks_by_relevance)
 
 
 def test_snooze_empty_task() -> None:
@@ -119,3 +119,17 @@ def test_tasks_from_primitive_dicts_with_dates() -> None:
     )]
     assert tasks_from_primitive_dicts(dicts) == expected
 
+
+def test_sort_tasks_by_relevance() -> None:
+    tasks = [
+        Task("due", due=date(6, 4, 6)),
+        Task("normal"),
+        Task("snoozed", snooze=date(9999, 9, 9)),
+        Task("completed", completed=date(1, 1, 1))]
+    sorted_tasks = sort_tasks_by_relevance(tasks)
+    expected = (
+        [Task("due", due=date(6, 4, 6))],
+        [Task("normal")],
+        [Task("snoozed", snooze=date(9999, 9, 9))],
+        [Task("completed", completed=date(1, 1, 1))])
+    assert sorted_tasks == expected
