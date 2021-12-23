@@ -1,13 +1,8 @@
-from typing import Optional, List, cast
+from typing import Optional
 from datetime import date
 from dataclasses import replace
-from pickle import load
-from pathlib import Path
-import json
 
-from PySide6 import QtCore
-
-from task import Task, Importance, SubTask, to_primitive_dicts
+from task import Task, Importance
 from history import History, Tasks
 
 
