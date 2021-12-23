@@ -21,12 +21,9 @@ class MockSerializerWrapper:
     def __init__(self, tasks: list[Task]) -> None:
         self.path: Optional[Path] = None
 
-        def set_path(path: Path) -> None:
-            self.path = path
-
         class MockSerializer:
-            def __init__(self, path: Path) -> None:
-                set_path(path)
+            def __init__(_, path: Path) -> None:
+                self.path = path
 
             def load(self) -> list[Task]:
                 return tasks
