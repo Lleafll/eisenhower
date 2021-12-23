@@ -24,6 +24,7 @@ class MockView:
 class MockSerializerWrapper:
     def __init__(self, tasks: list[Task]) -> None:
         self.path: Optional[Path] = None
+        self.tasks = tasks
 
         class MockSerializer:
             def __init__(_, path: Path) -> None:
@@ -31,6 +32,9 @@ class MockSerializerWrapper:
 
             def load(self) -> list[Task]:
                 return tasks
+
+            def save(_, new_tasks: list[Task]) -> None:
+                self.tasks = new_tasks
 
         self.serializer = MockSerializer
 
@@ -62,3 +66,21 @@ def test_request_update_update_tasks_when_file_is_loaded() -> None:
     view.update_tasks_calls = []
     presenter.request_update()
     assert view.update_tasks_calls == [[Task("dill")]]
+
+
+def test_add_task_updates_tasks() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("curry")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path("load_path"))
+    presenter.add_task(Task("asos"))
+    assert view.update_tasks_calls[-1] == [Task("curry"), Task("asos")]
+
+
+def test_add_task_saves_tasks() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("lamp")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path(""))
+    presenter.add_task(Task("clock"))
+    assert serializer_wrapper.tasks == [Task("lamp"), Task("clock")]

@@ -170,13 +170,9 @@ class MainWindowQt(QtWidgets.QWidget):
         self.update()
 
     def _add_task(self) -> None:
-        if self._task_manager is None:
-            return
         task = TaskCreatorDialogQt.ask_new_task(self)
-        if task is None:
-            return
-        self._task_manager.instance.add(task)
-        self._update_and_save()
+        if task is not None:
+            self._presenter.add_task(task)
 
     def _complete_task(self, task: Task) -> None:
         if self._task_manager is None:

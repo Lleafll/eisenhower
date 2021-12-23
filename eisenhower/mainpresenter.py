@@ -2,14 +2,9 @@ from pathlib import Path
 from typing import Optional, Type, TypeVar
 from dataclasses import dataclass
 
+from task import Task
 from jsonserializer import JsonSerializer
 from taskmanager import TaskManager
-
-
-@dataclass(frozen=True)
-class _TaskManagerWrapper:
-    instance: TaskManager
-    path: Path
 
 
 _Serializer = TypeVar("_Serializer")
@@ -23,12 +18,11 @@ class MainPresenter:
         self._view = view
         self._serializer_type = serializer
         self._serializer: Optional[_Serializer] = None
-        self._task_manager: Optional[_TaskManagerWrapper] = None
+        self._task_manager: Optional[TaskManager] = None
 
     def load_from_file(self, path: Path) -> None:
         self._serializer = self._serializer_type(path)
-        task_manager = TaskManager(self._serializer.load())
-        self._task_manager = _TaskManagerWrapper(task_manager, path)
+        self._task_manager = TaskManager(self._serializer.load())
         self._view.setWindowTitle(path.name)
         self.request_update()
 
@@ -36,4 +30,15 @@ class MainPresenter:
         if self._task_manager is None:
             self._view.hide_lists()
         else:
-            self._view.update_tasks(self._task_manager.instance.tasks())
+            self._view.update_tasks(self._task_manager.tasks())
+
+    def _save_and_update_view(self) -> None:
+        assert self._task_manager is not None
+        assert self._serializer is not None
+        self._serializer.save(self._task_manager.tasks())
+        self._view.update_tasks(self._task_manager.tasks())
+
+    def add_task(self, task: Task) -> None:
+        assert self._task_manager is not None
+        self._task_manager.add(task)
+        self._save_and_update_view()
