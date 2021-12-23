@@ -11,6 +11,8 @@ class MockView:
         self.update_tasks_calls: list[list[Task]] = []
         self.window_title = ""
         self.hide_lists_calls = 0
+        self.undoable = False
+        self.redoable = False
 
     def update_tasks(self, tasks: list[Task]) -> None:
         self.update_tasks_calls.append(tasks)
@@ -21,11 +23,11 @@ class MockView:
     def hide_lists(self) -> None:
         self.hide_lists_calls += 1
 
-    def set_undoable(self, _) -> None:
-        pass
+    def set_undoable(self, undoable: bool) -> None:
+        self.undoable = undoable
 
-    def set_redoable(self, _) -> None:
-        pass
+    def set_redoable(self, redoable: bool) -> None:
+        self.redoable = redoable
 
 
 class MockSerializerWrapper:
@@ -154,3 +156,30 @@ def test_set_importance() -> None:
            == [Task("range", importance=Importance.Important)]
     assert serializer_wrapper.tasks == \
            [Task("range", importance=Importance.Important)]
+
+
+def test_undo() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("industry")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path())
+    presenter.add_task(Task("sector"))
+    presenter.undo()
+    assert view.update_tasks_calls[-1] == [Task("industry")]
+    assert serializer_wrapper.tasks == [Task("industry")]
+    assert not view.undoable
+    assert view.redoable
+
+
+def test_redo() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("new")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path())
+    presenter.add_task(Task("adaptive"))
+    presenter.undo()
+    presenter.redo()
+    assert view.update_tasks_calls[-1] == [Task("new"), Task("adaptive")]
+    assert serializer_wrapper.tasks == [Task("new"), Task("adaptive")]
+    assert view.undoable
+    assert not view.redoable
