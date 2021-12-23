@@ -1,3 +1,4 @@
+from datetime import date
 from pathlib import Path
 from typing import Optional
 
@@ -84,3 +85,14 @@ def test_add_task_saves_tasks() -> None:
     presenter.load_from_file(Path(""))
     presenter.add_task(Task("clock"))
     assert serializer_wrapper.tasks == [Task("lamp"), Task("clock")]
+
+
+def test_complete_task() -> None:
+    view = MockView()
+    serializer_wrapper = MockSerializerWrapper([Task("bind")])
+    presenter = MainPresenter(view, serializer_wrapper.serializer)
+    presenter.load_from_file(Path(""))
+    presenter.complete_task(Task("bind"))
+    assert view.update_tasks_calls[-1] \
+           == [Task("bind", completed=date.today())]
+    assert serializer_wrapper.tasks == [Task("bind", completed=date.today())]

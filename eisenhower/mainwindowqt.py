@@ -86,7 +86,8 @@ class MainWindowQt(QtWidgets.QWidget):
                 self._delegate_list,
                 self._drop_list):
             task_layout.addWidget(task_list)
-            task_list.complete_task_requested.connect(self._complete_task)
+            task_list.complete_task_requested.connect(
+                self._presenter.complete_task)
             task_list.delete_task_requested.connect(self._delete_task)
             task_list.rename_task_requested.connect(self._rename_task)
             task_list.schedule_task_requested.connect(self._set_task_due)
@@ -173,12 +174,6 @@ class MainWindowQt(QtWidgets.QWidget):
         task = TaskCreatorDialogQt.ask_new_task(self)
         if task is not None:
             self._presenter.add_task(task)
-
-    def _complete_task(self, task: Task) -> None:
-        if self._task_manager is None:
-            return
-        self._task_manager.instance.set_complete(task)
-        self._update_and_save()
 
     def _delete_task(self, task: Task) -> None:
         if self._task_manager is None:
