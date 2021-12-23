@@ -2,6 +2,7 @@ from datetime import date
 from pathlib import Path
 from typing import Optional, TypeVar
 
+import eisenhower  # For forward reference
 from task import Task, Importance
 from jsonserializer import JsonSerializer
 from taskmanager import TaskManager
@@ -13,7 +14,7 @@ _Serializer = TypeVar("_Serializer")
 class MainPresenter:
     def __init__(
             self,
-            view: "MainWindowQt",
+            view: "eisenhower.mainwindowqt.MainWindowQt",
             serializer: _Serializer = JsonSerializer) -> None:
         self._view = view
         self._serializer_type = serializer
