@@ -1,10 +1,18 @@
 from datetime import date
 from pathlib import Path
-from typing import Optional, TypeVar, Any
+from typing import Optional, Protocol, Sequence, Type, TypeVar
 
 from task import Task, Importance
 from jsonserializer import JsonSerializer
 from taskmanager import TaskManager
+
+
+class _View(Protocol):
+    def hide_lists(self) -> None: ...
+    def set_redoable(self, redoable: bool) -> None: ...
+    def set_undoable(self, undoable: bool) -> None: ...
+    def setWindowTitle(self, title: str) -> None: ...
+    def update_tasks(self, tasks: Sequence[Task]) -> None: ...
 
 
 _Serializer = TypeVar("_Serializer")
@@ -13,10 +21,10 @@ _Serializer = TypeVar("_Serializer")
 class MainPresenter:
     def __init__(
             self,
-            view: Any,
-            serializer: _Serializer = JsonSerializer) -> None:
+            view: _View,
+            serializer_type: Type[_Serializer] = JsonSerializer) -> None:
         self._view = view
-        self._serializer_type = serializer
+        self._serializer_type = serializer_type
         self._serializer: Optional[_Serializer] = None
         self._task_manager: Optional[TaskManager] = None
 

@@ -1,6 +1,6 @@
 from datetime import date
 from pathlib import Path
-from typing import Optional
+from typing import Optional, Sequence
 
 from mainpresenter import MainPresenter
 from task import Task, Importance
@@ -14,8 +14,8 @@ class MockView:
         self.undoable = False
         self.redoable = False
 
-    def update_tasks(self, tasks: list[Task]) -> None:
-        self.update_tasks_calls.append(tasks)
+    def update_tasks(self, tasks: Sequence[Task]) -> None:
+        self.update_tasks_calls.append(list(tasks))
 
     def setWindowTitle(self, title: str) -> None:
         self.window_title = title
@@ -33,7 +33,7 @@ class MockView:
 class MockSerializerWrapper:
     def __init__(self, tasks: list[Task]) -> None:
         self.path: Optional[Path] = None
-        self.tasks = tasks
+        self.tasks: list[Task] = tasks
 
         class MockSerializer:
             def __init__(_, path: Path) -> None:
@@ -42,8 +42,8 @@ class MockSerializerWrapper:
             def load(self) -> list[Task]:
                 return tasks
 
-            def save(_, new_tasks: list[Task]) -> None:
-                self.tasks = new_tasks
+            def save(_, new_tasks: Sequence[Task]) -> None:
+                self.tasks = list(new_tasks)
 
         self.serializer = MockSerializer
 

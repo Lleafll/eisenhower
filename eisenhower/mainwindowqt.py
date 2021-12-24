@@ -1,5 +1,7 @@
 from pathlib import Path
 from itertools import filterfalse
+from typing import Sequence
+
 from PySide6 import QtWidgets, QtGui, QtCore
 
 from mainpresenter import MainPresenter
@@ -135,7 +137,7 @@ class MainWindowQt(QtWidgets.QWidget):
         self._redo_button.hide()
         self._show_archive_button.hide()
 
-    def update_tasks(self, tasks: list[Task]) -> None:
+    def update_tasks(self, tasks: Sequence[Task]) -> None:
         non_archived_tasks = list(filterfalse(is_completed, tasks))
         archived_tasks = filter(is_completed, tasks)
         for filter_func, task_list in (
